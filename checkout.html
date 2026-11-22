@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUVORA - Checkout</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #fffaf3;
+            color: #222;
+        }
+
+        header {
+            background: #111;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-weight: bold;
+        }
+
+        .item-price {
+            font-weight: bold;
+        }
+
+        .agreed-label {
+            color: #168a45;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .offer-banner {
+            background: #e5ffe9;
+            color: #087522;
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #e8790c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #999;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error {
+            background: #ffe5e5;
+            color: #a00000;
+        }
+
+        .success {
+            background: #e5ffe9;
+            color: #087522;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        NUVORA
+    </div>
+
+    <a href="cart.html" class="back-link">
+        ← Back to Cart
+    </a>
+
+</header>
+
+
+<div class="container">
+
+    <h1>Checkout</h1>
+
+
+    <!-- ORDER SUMMARY -->
+
+    <div class="section">
+
+        <h2>Order Summary</h2>
+
+        <div id="offerBanner"></div>
+
+        <div id="cartItems">
+
+            <div class="empty">
+                Loading cart...
+            </div>
+
+        </div>
+
+        <div class="total">
+
+            <span>
+                Total
+            </span>
+
+            <span id="totalAmount">
+                ₦0
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- DELIVERY -->
+
+    <form id="checkoutForm">
+
+        <div class="section">
+
+            <h2>
+                Delivery Information
+            </h2>
+
+
+            <label for="fullName">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="fullName"
+                required
+            >
+
+
+            <label for="phone">
+                Phone Number
+            </label>
+
+            <input
+                type="tel"
+                id="phone"
+                required
+            >
+
+
+            <label for="state">
+                State
+            </label>
+
+            <input
+                type="text"
+                id="state"
+                required
+            >
+
+
+            <label for="city">
+                City / LGA
+            </label>
+
+            <input
+                type="text"
+                id="city"
+                required
+            >
+
+
+            <label for="address">
+                Delivery Address
+            </label>
+
+            <textarea
+                id="address"
+                required
+            ></textarea>
+
+        </div>
+
+
+        <!-- PAYMENT -->
+
+        <div class="section">
+
+            <h2>
+                Payment
+            </h2>
+
+            <p style="margin-bottom:18px;">
+                You will be redirected to Paystack
+                to complete your payment securely.
+            </p>
+
+
+            <button
+                type="submit"
+                id="payButton"
+            >
+                Continue to Payment
+            </button>
+
+
+            <div
+                id="message"
+                class="message"
+            ></div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+
+const PAYSTACK_FUNCTION_URL =
+    SUPABASE_URL + "/functions/v1/hello-world";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+const CART_KEY =
+    "nuvoraCart";
+
+
+const PENDING_CHECKOUT_KEY =
+    "nuvoraPendingCheckout";
+
+
+const ACCEPTED_OFFER_KEY =
+    "nuvoraAcceptedOffer";
+
+
+let cart = [];
+
+let total = 0;
+
+let acceptedOffer = null;
+
+
+// ============================
+// ESCAPE HTML
+// ============================
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================
+// MESSAGE
+// ============================
+
+function showMessage(
+    text,
+    type
+) {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    message.textContent =
+        text;
+
+    message.className =
+        "message " + type;
+
+    message.style.display =
+        "block";
+
+}
+
+
+// ============================
+// GET USER
+// ============================
+
+async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (
+        error ||
+        !data.user
+    ) {
+
+        return null;
+
+    }
+
+
+    return data.user;
+
+}
+
+
+// ============================
+// LOAD ACCEPTED OFFER
+// ============================
+
+async function loadAcceptedOffer() {
+
+    const savedOffer =
+        sessionStorage.getItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+
+    if (!savedOffer) {
+
+        return false;
+
+    }
+
+
+    let offerData;
+
+
+    try {
+
+        offerData =
+            JSON.parse(
+                savedOffer
+            );
+
+    } catch (error) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        return false;
+
+    }
+
+
+    if (
+        !offerData ||
+        !offerData.offer_id
+    ) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        return false;
+
+    }
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        return false;
+
+    }
+
+
+    // Verify the offer directly
+    // from Supabase.
+
+    const {
+        data: offer,
+        error
+    } =
+        await supabaseClient
+            .from("offers")
+            .select("*")
+            .eq(
+                "id",
+                offerData.offer_id
+            )
+            .eq(
+                "buyer_id",
+                user.id
+            )
+            .eq(
+                "status",
+                "accepted"
+            )
+            .maybeSingle();
+
+
+    if (
+        error ||
+        !offer
+    ) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        showMessage(
+            "This accepted offer is no longer available.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    // Verify the exact product.
+
+    const {
+        data: product,
+        error: productError
+    } =
+        await supabaseClient
+            .from("products")
+            .select(
+                "id,name,price,category,image_url,stock,seller_id"
+            )
+            .eq(
+                "id",
+                offer.product_id
+            )
+            .maybeSingle();
+
+
+    if (
+        productError ||
+        !product
+    ) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        showMessage(
+            "The product connected to this offer could not be found.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    // Make sure the seller matches.
+
+    if (
+        offer.seller_id !==
+        product.seller_id
+    ) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        showMessage(
+            "The accepted offer could not be verified.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    // Make sure there is stock.
+
+    if (
+        Number(product.stock) <= 0
+    ) {
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+        showMessage(
+            "This product is currently out of stock.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    acceptedOffer = {
+
+        id:
+            offer.id,
+
+        product:
+            product,
+
+        amount:
+            Number(offer.amount)
+
+    };
+
+
+    // Important:
+    // Accepted offers are for ONE
+    // exact product.
+
+    cart = [
+
+        {
+
+            id:
+                product.id,
+
+            name:
+                product.name,
+
+            price:
+                Number(offer.amount),
+
+            quantity:
+                1,
+
+            offer_id:
+                offer.id,
+
+            seller_id:
+                product.seller_id
+
+        }
+
+    ];
+
+
+    total =
+        Number(
+            offer.amount
+        );
+
+
+    const banner =
+        document.getElementById(
+            "offerBanner"
+        );
+
+
+    banner.innerHTML = `
+
+        <div class="offer-banner">
+
+            🤝 Agreed price confirmed:
+            ₦${Number(
+                offer.amount
+            ).toLocaleString()}
+
+        </div>
+
+    `;
+
+
+    return true;
+
+}
+
+
+// ============================
+// LOAD NORMAL CART
+// ============================
+
+function loadNormalCart() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                CART_KEY
+            );
+
+        cart =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+
+        if (!Array.isArray(cart)) {
+
+            cart = [];
+
+        }
+
+    } catch (error) {
+
+        cart = [];
+
+    }
+
+
+    renderCart();
+
+}
+
+
+// ============================
+// DISPLAY CART
+// ============================
+
+function renderCart() {
+
+    const cartItems =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    const totalAmount =
+        document.getElementById(
+            "totalAmount"
+        );
+
+
+    if (cart.length === 0) {
+
+        cartItems.innerHTML = `
+
+            <div class="empty">
+
+                Your cart is empty.
+
+            </div>
+
+        `;
+
+        total = 0;
+
+        totalAmount.textContent =
+            "₦0";
+
+        return;
+
+    }
+
+
+    total = 0;
+
+
+    cartItems.innerHTML =
+        cart.map(item => {
+
+            const price =
+                Number(item.price) || 0;
+
+
+            const quantity =
+                Number(item.quantity) || 1;
+
+
+            const itemTotal =
+                price * quantity;
+
+
+            total +=
+                itemTotal;
+
+
+            const isOffer =
+                !!item.offer_id;
+
+
+            return `
+
+                <div class="cart-item">
+
+                    <div>
+
+                        <div class="item-name">
+
+                            ${escapeHTML(
+                                item.name ||
+                                "Product"
+                            )}
+
+                        </div>
+
+                        <div>
+
+                            Quantity:
+                            ${quantity}
+
+                        </div>
+
+                        ${
+                            isOffer
+                            ? `
+                                <div class="agreed-label">
+                                    ✓ Agreed offer price
+                                </div>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+
+                    <div class="item-price">
+
+                        ₦${itemTotal.toLocaleString()}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+
+    totalAmount.textContent =
+        "₦" +
+        total.toLocaleString();
+
+}
+
+
+// ============================
+// COMPLETE PAYMENT
+// ============================
+
+async function completePayment() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const reference =
+        params.get("reference") ||
+        params.get("trxref");
+
+
+    if (!reference) {
+
+        return;
+
+    }
+
+
+    const pendingData =
+        sessionStorage.getItem(
+            PENDING_CHECKOUT_KEY
+        );
+
+
+    if (!pendingData) {
+
+        showMessage(
+            "This payment has already been processed or the checkout session has expired.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    let pendingCheckout;
+
+
+    try {
+
+        pendingCheckout =
+            JSON.parse(
+                pendingData
+            );
+
+    } catch (error) {
+
+        showMessage(
+            "Unable to recover your checkout information.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        showMessage(
+            "Please log in again to complete your order.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "payButton"
+        );
+
+
+    button.disabled =
+        true;
+
+    button.textContent =
+        "Verifying Payment...";
+
+
+    try {
+
+        // ============================
+        // VERIFY PAYSTACK
+        // ============================
+
+        const verifyResponse =
+            await fetch(
+                PAYSTACK_FUNCTION_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "apikey":
+                            SUPABASE_KEY
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "verify",
+
+                            reference:
+                                reference
+
+                        })
+                }
+            );
+
+
+        const verifyResult =
+            await verifyResponse.json();
+
+
+        console.log(
+            "Payment verification:",
+            verifyResult
+        );
+
+
+        if (
+            !verifyResponse.ok ||
+            !verifyResult.status ||
+            !verifyResult.data ||
+            verifyResult.data.status !==
+                "success"
+        ) {
+
+            throw new Error(
+                "Payment could not be verified."
+            );
+
+        }
+
+
+        // ============================
+        // VERIFY PAYMENT AMOUNT
+        // ============================
+
+        const paidAmount =
+            Number(
+                verifyResult.data.amount
+            ) / 100;
+
+
+        const expectedAmount =
+            Number(
+                pendingCheckout.total
+            );
+
+
+        if (
+            !Number.isFinite(
+                paidAmount
+            ) ||
+            Math.round(
+                paidAmount * 100
+            ) !==
+            Math.round(
+                expectedAmount * 100
+            )
+        ) {
+
+            throw new Error(
+                "The payment amount does not match the order amount."
+            );
+
+        }
+
+
+        // ============================
+        // CREATE ORDER
+        // ============================
+
+        button.textContent =
+            "Creating Order...";
+
+
+        const {
+            data: orderId,
+            error: orderError
+        } =
+            await supabaseClient.rpc(
+                "create_nuvora_order",
+                {
+
+                    p_customer_name:
+                        pendingCheckout.fullName,
+
+                    p_phone:
+                        pendingCheckout.phone,
+
+                    p_state:
+                        pendingCheckout.state,
+
+                    p_city:
+                        pendingCheckout.city,
+
+                    p_address:
+                        pendingCheckout.address,
+
+                    p_total_amount:
+                        pendingCheckout.total,
+
+                    p_items:
+                        pendingCheckout.cart,
+
+                    p_payment_reference:
+                        reference
+
+                }
+            );
+
+
+        if (orderError) {
+
+            console.error(
+                "Order creation error:",
+                orderError
+            );
+
+            throw new Error(
+                "Payment was successful, but we could not create your order."
+            );
+
+        }
+
+
+        console.log(
+            "NUVORA order created:",
+            orderId
+        );
+
+
+        // ============================
+        // CLEAR CHECKOUT DATA
+        // ============================
+
+        localStorage.removeItem(
+            CART_KEY
+        );
+
+
+        sessionStorage.removeItem(
+            PENDING_CHECKOUT_KEY
+        );
+
+
+        sessionStorage.removeItem(
+            ACCEPTED_OFFER_KEY
+        );
+
+
+        cart = [];
+
+        total = 0;
+
+
+        // ============================
+        // SUCCESS
+        // ============================
+
+        document.getElementById(
+            "cartItems"
+        ).innerHTML = `
+
+            <div class="empty">
+
+                Payment successful!<br><br>
+
+                Your NUVORA order has been created.
+
+            </div>
+
+        `;
+
+
+        document.getElementById(
+            "totalAmount"
+        ).textContent =
+            "₦0";
+
+
+        document.getElementById(
+            "checkoutForm"
+        ).innerHTML = `
+
+            <div class="section">
+
+                <h2>
+                    Order Confirmed 🎉
+                </h2>
+
+                <p style="margin-top:15px;">
+
+                    Your payment has been verified
+                    and your order was created successfully.
+
+                </p>
+
+                <p style="margin-top:12px;">
+
+                    Order ID:
+                    ${escapeHTML(
+                        orderId
+                    )}
+
+                </p>
+
+                <button
+                    type="button"
+                    id="continueShopping"
+                    style="margin-top:20px;"
+                >
+                    Continue Shopping
+                </button>
+
+            </div>
+
+        `;
+
+
+        document
+            .getElementById(
+                "continueShopping"
+            )
+            .addEventListener(
+                "click",
+                function() {
+
+                    window.location.href =
+                        "products.html";
+
+                }
+            );
+
+
+        showMessage(
+            "Payment verified and order created successfully.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Something went wrong while completing your order.",
+            "error"
+        );
+
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            "Continue to Payment";
+
+    }
+
+}
+
+
+// ============================
+// START PAYMENT
+// ============================
+
+document
+    .getElementById("checkoutForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const button =
+                document.getElementById(
+                    "payButton"
+                );
+
+
+            const user =
+                await getCurrentUser();
+
+
+            if (!user) {
+
+                showMessage(
+                    "Please log in before checking out.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (cart.length === 0) {
+
+                showMessage(
+                    "Your cart is empty.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            const fullName =
+                document
+                    .getElementById(
+                        "fullName"
+                    )
+                    .value
+                    .trim();
+
+
+            const phone =
+                document
+                    .getElementById(
+                        "phone"
+                    )
+                    .value
+                    .trim();
+
+
+            const state =
+                document
+                    .getElementById(
+                        "state"
+                    )
+                    .value
+                    .trim();
+
+
+            const city =
+                document
+                    .getElementById(
+                        "city"
+                    )
+                    .value
+                    .trim();
+
+
+            const address =
+                document
+                    .getElementById(
+                        "address"
+                    )
+                    .value
+                    .trim();
+
+
+            if (
+                !fullName ||
+                !phone ||
+                !state ||
+                !city ||
+                !address
+            ) {
+
+                showMessage(
+                    "Please complete all delivery information.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "Connecting to Paystack...";
+
+
+            try {
+
+                // ============================
+                // PAYMENT REFERENCE
+                // ============================
+
+                const reference =
+                    "NUVORA_" +
+                    Date.now() +
+                    "_" +
+                    user.id.substring(
+                        0,
+                        8
+                    );
+
+
+                // ============================
+                // CALLBACK URL
+                // ============================
+
+                const callbackUrl =
+                    window.location.origin +
+                    window.location.pathname;
+
+
+                // ============================
+                // SAVE CHECKOUT
+                // ============================
+
+                const pendingCheckout = {
+
+                    fullName:
+                        fullName,
+
+                    phone:
+                        phone,
+
+                    state:
+                        state,
+
+                    city:
+                        city,
+
+                    address:
+                        address,
+
+                    total:
+                        total,
+
+                    cart:
+                        cart,
+
+                    reference:
+                        reference
+
+                };
+
+
+                sessionStorage.setItem(
+                    PENDING_CHECKOUT_KEY,
+                    JSON.stringify(
+                        pendingCheckout
+                    )
+                );
+
+
+                // ============================
+                // CALL EDGE FUNCTION
+                // ============================
+
+                const response =
+                    await fetch(
+                        PAYSTACK_FUNCTION_URL,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    "Bearer " +
+                                    SUPABASE_KEY,
+
+                                "apikey":
+                                    SUPABASE_KEY
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    action:
+                                        "initialize",
+
+                                    email:
+                                        user.email,
+
+                                    amount:
+                                        total,
+
+                                    reference:
+                                        reference,
+
+                                    callback_url:
+                                        callbackUrl
+
+                                })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "Paystack response:",
+                    result
+                );
+
+
+                if (
+                    !response.ok ||
+                    !result.status ||
+                    !result.data ||
+                    !result.data.authorization_url
+                ) {
+
+                    throw new Error(
+                        result.error ||
+                        "Unable to initialize Paystack payment."
+                    );
+
+                }
+
+
+                // ============================
+                // REDIRECT
+                // ============================
+
+                window.location.href =
+                    result.data.authorization_url;
+
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                showMessage(
+                    error.message ||
+                    "Unable to start payment.",
+                    "error"
+                );
+
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    "Continue to Payment";
+
+            }
+
+        }
+    );
+
+
+// ============================
+// START
+// ============================
+
+async function startCheckout() {
+
+    const offerLoaded =
+        await loadAcceptedOffer();
+
+
+    if (offerLoaded) {
+
+        renderCart();
+
+    } else {
+
+        loadNormalCart();
+
+    }
+
+}
+
+
+startCheckout();
+
+
+// ============================
+// CHECK PAYSTACK RETURN
+// ============================
+
+completePayment();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NUVORA - Product</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #111827;
+}
+
+
+/* HEADER */
+
+header {
+    background: #111827;
+    color: white;
+    padding: 18px 5%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.auth-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-link {
+    color: white;
+    text-decoration: none;
+}
+
+.signup-link {
+    background: #2563eb;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+.logout-btn {
+    border: none;
+    background: #ef4444;
+    color: white;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.cart-link {
+    background: white;
+    color: #111827;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+
+/* MAIN */
+
+.container {
+    max-width: 1050px;
+
+    margin: 30px auto;
+
+    padding: 20px;
+}
+
+
+/* PRODUCT */
+
+.product-box {
+    background: white;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 30px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.08);
+}
+
+.product-image {
+    width: 100%;
+
+    height: 400px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    background: #f3f4f6;
+}
+
+.product-name {
+    font-size: 32px;
+
+    margin-bottom: 15px;
+}
+
+.price {
+    font-size: 27px;
+
+    font-weight: bold;
+
+    margin: 15px 0;
+}
+
+.description {
+    line-height: 1.6;
+
+    margin-bottom: 20px;
+}
+
+.info {
+    margin: 12px 0;
+}
+
+
+/* BUTTONS */
+
+.buy-btn,
+.message-seller-btn {
+    width: 100%;
+
+    padding: 15px;
+
+    margin-top: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+.buy-btn {
+    background: #111827;
+    color: white;
+}
+
+.message-seller-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.buy-btn:hover,
+.message-seller-btn:hover {
+    opacity: 0.9;
+}
+
+.message {
+    margin-top: 15px;
+
+    font-weight: bold;
+
+    color: #15803d;
+}
+
+
+/* SELLER */
+
+.seller-box {
+    margin-top: 25px;
+
+    background: white;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.06);
+}
+
+.seller-title {
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+.seller-content {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+.seller-picture {
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #e5e7eb;
+
+    border: 2px solid #e5e7eb;
+}
+
+.seller-placeholder {
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 50%;
+
+    background: #e5e7eb;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 25px;
+}
+
+.seller-name {
+    font-size: 16px;
+
+    font-weight: bold;
+
+    margin-bottom: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+.badges {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+}
+
+.badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+.seller-badge {
+    background: #eef2ff;
+
+    color: #4338ca;
+}
+
+
+/* BLUE VERIFIED CHECK */
+
+.verified-check {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 18px;
+
+    height: 18px;
+
+    min-width: 18px;
+
+    border-radius: 50%;
+
+    background: #1877f2;
+
+    color: white;
+
+    font-size: 11px;
+
+    font-weight: 900;
+
+    line-height: 1;
+
+    margin-left: 2px;
+
+    vertical-align: middle;
+}
+
+
+/* GOLD TOP SELLER CHECK */
+
+.top-seller-check {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 18px;
+
+    height: 18px;
+
+    min-width: 18px;
+
+    border-radius: 50%;
+
+    background: #d4af37;
+
+    color: white;
+
+    font-size: 11px;
+
+    font-weight: 900;
+
+    line-height: 1;
+
+    margin-left: 2px;
+
+    vertical-align: middle;
+}
+
+
+/* ERROR */
+
+.error {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    header {
+        flex-direction: column;
+    }
+
+    nav {
+        justify-content: center;
+    }
+
+    .product-box {
+        grid-template-columns: 1fr;
+    }
+
+    .product-image {
+        height: 300px;
+    }
+
+    .product-name {
+        font-size: 26px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        NUVORA
+    </div>
+
+
+    <nav>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="products.html">
+            Shop
+        </a>
+
+        <a href="sell.html">
+            Sell
+        </a>
+
+
+        <div
+            id="authArea"
+            class="auth-area"
+        >
+            Loading...
+        </div>
+
+
+        <a
+            href="cart.html"
+            class="cart-link"
+        >
+            🛒 Cart
+            (<span id="cartCount">0</span>)
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<div class="container">
+
+    <div id="productArea">
+        Loading product...
+    </div>
+
+
+    <!-- SELLER INFORMATION -->
+
+    <div
+        id="sellerInfo"
+        class="seller-box"
+    >
+
+        <div class="seller-title">
+            Seller
+        </div>
+
+
+        <div
+            id="sellerContent"
+            class="seller-content"
+        >
+
+            <div class="seller-placeholder">
+                👤
+            </div>
+
+
+            <div>
+
+                <div class="seller-name">
+                    Loading seller...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* SUPABASE */
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* CURRENT USER */
+
+let currentUser = null;
+
+
+/* PRODUCT */
+
+let currentProduct = null;
+
+
+/* PRODUCT ID */
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const productId =
+    urlParams.get("id");
+
+
+
+/* ESCAPE HTML */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+
+/* LOGIN SESSION */
+
+async function checkUser() {
+
+    const {
+        data: {
+            user
+        }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    currentUser = user;
+
+
+    const authArea =
+        document.getElementById(
+            "authArea"
+        );
+
+
+    if (user) {
+
+        const {
+            data: profile
+        } =
+            await supabaseClient
+                .from("user_profiles")
+                .select(
+                    "display_name, profile_picture_url"
+                )
+                .eq("id", user.id)
+                .maybeSingle();
+
+
+        const name =
+            profile?.display_name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User";
+
+
+        let pictureHTML = "";
+
+
+        if (
+            profile?.profile_picture_url
+        ) {
+
+            pictureHTML = `
+
+                <img
+                    src="${escapeHTML(
+                        profile.profile_picture_url
+                    )}"
+                    alt="Profile"
+                    style="
+                        width:32px;
+                        height:32px;
+                        border-radius:50%;
+                        object-fit:cover;
+                        vertical-align:middle;
+                        margin-right:5px;
+                    "
+                >
+
+            `;
+
+        }
+
+
+        authArea.innerHTML = `
+
+            <a
+                href="profile.html"
+                class="auth-link"
+                style="
+                    display:flex;
+                    align-items:center;
+                "
+            >
+
+                ${pictureHTML}
+
+                <span class="user-name">
+                    ${escapeHTML(name)}
+                </span>
+
+            </a>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Log Out
+            </button>
+
+        `;
+
+    } else {
+
+        authArea.innerHTML = `
+
+            <a
+                href="signup.html"
+                class="auth-link signup-link"
+            >
+                Sign Up
+            </a>
+
+
+            <a
+                href="login.html"
+                class="auth-link"
+            >
+                Log In
+            </a>
+
+        `;
+
+    }
+
+}
+
+
+
+/* LOG OUT */
+
+async function logout() {
+
+    const {
+        error
+    } =
+        await supabaseClient.auth.signOut();
+
+
+    if (error) {
+
+        alert(
+            "Unable to log out: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    window.location.reload();
+
+}
+
+
+
+/* CART COUNT */
+
+function updateCartCount() {
+
+    const cart =
+        JSON.parse(
+            localStorage.getItem(
+                "nuvoraCart"
+            ) || "[]"
+        );
+
+
+    let total = 0;
+
+
+    cart.forEach(function(item) {
+
+        total += Number(
+            item.quantity || 0
+        );
+
+    });
+
+
+    document.getElementById(
+        "cartCount"
+    ).textContent = total;
+
+}
+
+
+
+/* LOAD SELLER */
+
+async function loadSeller(sellerId) {
+
+    const sellerContent =
+        document.getElementById(
+            "sellerContent"
+        );
+
+
+    if (!sellerId) {
+
+        sellerContent.innerHTML = `
+
+            <div class="seller-placeholder">
+                👤
+            </div>
+
+            <div>
+
+                <div class="seller-name">
+                    Seller information unavailable
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    const {
+        data: seller,
+        error
+    } =
+        await supabaseClient
+            .from("seller_profiles")
+            .select(
+                "display_name, profile_picture_url, seller_status, average_rating, total_completed_orders, is_verified"
+            )
+            .eq("id", sellerId)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.log(
+            "Seller profile error:",
+            error
+        );
+
+    }
+
+
+    if (!seller) {
+
+        sellerContent.innerHTML = `
+
+            <div class="seller-placeholder">
+                👤
+            </div>
+
+            <div>
+
+                <div class="seller-name">
+                    Seller
+                </div>
+
+                <div class="badges">
+
+                    <span class="badge seller-badge">
+                        Seller
+                    </span>
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    const sellerName =
+        seller.display_name ||
+        "Seller";
+
+
+    let pictureHTML = `
+
+        <div class="seller-placeholder">
+            👤
+        </div>
+
+    `;
+
+
+    if (seller.profile_picture_url) {
+
+        pictureHTML = `
+
+            <img
+                src="${escapeHTML(
+                    seller.profile_picture_url
+                )}"
+                class="seller-picture"
+                alt="Seller profile picture"
+            >
+
+        `;
+
+    }
+
+
+    let badgesHTML = `
+
+        <span class="badge seller-badge">
+            Seller
+        </span>
+
+    `;
+
+
+    const isTopSeller =
+        seller.seller_status ===
+        "top_seller";
+
+
+    const isVerified =
+        seller.is_verified === true ||
+        seller.seller_status ===
+        "verified" ||
+        isTopSeller;
+
+
+    let sellerNameBadge = "";
+
+
+    if (isTopSeller) {
+
+        sellerNameBadge = `
+
+            <span
+                class="top-seller-check"
+                title="Top Seller"
+                aria-label="Top Seller"
+            >
+                ✓
+            </span>
+
+        `;
+
+    }
+
+    else if (isVerified) {
+
+        sellerNameBadge = `
+
+            <span
+                class="verified-check"
+                title="Verified Seller"
+                aria-label="Verified Seller"
+            >
+                ✓
+            </span>
+
+        `;
+
+    }
+
+
+    sellerContent.innerHTML = `
+
+        ${pictureHTML}
+
+
+        <div>
+
+            <div class="seller-name">
+
+                ${escapeHTML(sellerName)}
+
+                ${sellerNameBadge}
+
+            </div>
+
+
+            <div class="badges">
+
+                ${badgesHTML}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+
+/* MESSAGE SELLER */
+
+async function messageSeller() {
+
+    if (!currentUser) {
+
+        alert(
+            "Please log in before messaging a seller."
+        );
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    if (!currentProduct) {
+
+        alert(
+            "Product information is not ready yet."
+        );
+
+        return;
+    }
+
+
+    const sellerId =
+        currentProduct.seller_id;
+
+
+    if (!sellerId) {
+
+        alert(
+            "Seller information is unavailable."
+        );
+
+        return;
+    }
+
+
+    if (
+        currentUser.id ===
+        sellerId
+    ) {
+
+        alert(
+            "You cannot message yourself."
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "messageSellerButton"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Opening messages...";
+
+
+    try {
+
+        /* FIND EXISTING CONVERSATION */
+
+        let {
+            data: conversation,
+            error: findError
+        } =
+            await supabaseClient
+                .from("conversations")
+                .select("*")
+                .eq(
+                    "buyer_id",
+                    currentUser.id
+                )
+                .eq(
+                    "seller_id",
+                    sellerId
+                )
+                .eq(
+                    "product_id",
+                    currentProduct.id
+                )
+                .maybeSingle();
+
+
+        if (findError) {
+
+            console.log(
+                "Conversation search error:",
+                findError
+            );
+
+        }
+
+
+        /* CREATE CONVERSATION IF NEEDED */
+
+        if (!conversation) {
+
+            const {
+                data: newConversation,
+                error: createError
+            } =
+                await supabaseClient
+                    .from("conversations")
+                    .insert({
+
+                        buyer_id:
+                            currentUser.id,
+
+                        seller_id:
+                            sellerId,
+
+                        product_id:
+                            currentProduct.id
+
+                    })
+                    .select()
+                    .single();
+
+
+            if (createError) {
+
+                /*
+                    Another click/device may have
+                    created the conversation already.
+                    Try finding it one more time.
+                */
+
+                console.log(
+                    "Conversation creation error:",
+                    createError
+                );
+
+
+                const {
+                    data: existingConversation
+                } =
+                    await supabaseClient
+                        .from("conversations")
+                        .select("*")
+                        .eq(
+                            "buyer_id",
+                            currentUser.id
+                        )
+                        .eq(
+                            "seller_id",
+                            sellerId
+                        )
+                        .eq(
+                            "product_id",
+                            currentProduct.id
+                        )
+                        .maybeSingle();
+
+
+                if (!existingConversation) {
+
+                    throw createError;
+
+                }
+
+
+                conversation =
+                    existingConversation;
+
+            } else {
+
+                conversation =
+                    newConversation;
+
+            }
+
+        }
+
+
+        /* OPEN MESSAGES */
+
+        window.location.href =
+            "messages.html?conversation=" +
+            encodeURIComponent(
+                conversation.id
+            );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Message seller error:",
+            error
+        );
+
+
+        alert(
+            "Unable to open conversation: " +
+            error.message
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "💬 Message Seller";
+
+    }
+
+}
+
+
+
+/* LOAD PRODUCT */
+
+async function loadProduct() {
+
+    const productArea =
+        document.getElementById(
+            "productArea"
+        );
+
+
+    if (!productId) {
+
+        productArea.innerHTML = `
+
+            <div class="error">
+
+                <h2>
+                    Product not found
+                </h2>
+
+                <p>
+                    No product ID was provided.
+                </p>
+
+                <br>
+
+                <a href="products.html">
+                    Back to Shop
+                </a>
+
+            </div>
+
+        `;
+
+
+        document.getElementById(
+            "sellerInfo"
+        ).style.display = "none";
+
+
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .select("*")
+            .eq("id", productId)
+            .single();
+
+
+    if (error) {
+
+        console.log(
+            "Product error:",
+            error
+        );
+
+
+        productArea.innerHTML = `
+
+            <div class="error">
+
+                <h2>
+                    Unable to load product
+                </h2>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+                <br>
+
+                <a href="products.html">
+                    Back to Shop
+                </a>
+
+            </div>
+
+        `;
+
+
+        document.getElementById(
+            "sellerInfo"
+        ).style.display = "none";
+
+
+        return;
+    }
+
+
+    currentProduct = data;
+
+
+    let imageHTML = "";
+
+
+    if (currentProduct.image_url) {
+
+        imageHTML = `
+
+            <img
+                src="${escapeHTML(
+                    currentProduct.image_url
+                )}"
+                class="product-image"
+                alt="${escapeHTML(
+                    currentProduct.name
+                )}"
+            >
+
+        `;
+
+    } else {
+
+        imageHTML = `
+
+            <div class="product-image"></div>
+
+        `;
+
+    }
+
+
+    productArea.innerHTML = `
+
+        <div class="product-box">
+
+
+            <div>
+
+                ${imageHTML}
+
+            </div>
+
+
+            <div>
+
+
+                <h1 class="product-name">
+
+                    ${escapeHTML(
+                        currentProduct.name
+                    )}
+
+                </h1>
+
+
+                <div class="price">
+
+                    ₦${Number(
+                        currentProduct.price || 0
+                    ).toLocaleString()}
+
+                </div>
+
+
+                <p class="description">
+
+                    ${escapeHTML(
+                        currentProduct.description ||
+                        "No description available."
+                    )}
+
+                </p>
+
+
+                <div class="info">
+
+                    <strong>
+                        Category:
+                    </strong>
+
+                    ${escapeHTML(
+                        currentProduct.category ||
+                        "Not specified"
+                    )}
+
+                </div>
+
+
+                <div class="info">
+
+                    <strong>
+                        Location:
+                    </strong>
+
+                    ${escapeHTML(
+                        currentProduct.city || ""
+                    )}
+
+                    ${
+                        currentProduct.state
+                        ? ", " +
+                          escapeHTML(
+                              currentProduct.state
+                          )
+                        : ""
+                    }
+
+                    ${
+                        currentProduct.country
+                        ? ", " +
+                          escapeHTML(
+                              currentProduct.country
+                          )
+                        : ""
+                    }
+
+                </div>
+
+
+                <div class="info">
+
+                    <strong>
+                        Stock:
+                    </strong>
+
+                    ${Number(
+                        currentProduct.stock || 0
+                    )}
+
+                </div>
+
+
+                <button
+                    class="buy-btn"
+                    id="addCartButton"
+                >
+                    🛒 Add to Cart
+                </button>
+
+
+                <button
+                    class="message-seller-btn"
+                    id="messageSellerButton"
+                >
+                    💬 Message Seller
+                </button>
+
+
+                <div
+                    id="message"
+                    class="message"
+                ></div>
+
+
+            </div>
+
+
+        </div>
+
+    `;
+
+
+    document
+        .getElementById(
+            "addCartButton"
+        )
+        .addEventListener(
+            "click",
+            addToCart
+        );
+
+
+    document
+        .getElementById(
+            "messageSellerButton"
+        )
+        .addEventListener(
+            "click",
+            messageSeller
+        );
+
+
+    /* LOAD SELLER */
+
+    await loadSeller(
+        currentProduct.seller_id
+    );
+
+}
+
+
+
+/* ADD TO CART */
+
+function addToCart() {
+
+    if (!currentProduct) {
+        return;
+    }
+
+
+    let cart =
+        JSON.parse(
+            localStorage.getItem(
+                "nuvoraCart"
+            ) || "[]"
+        );
+
+
+    const existing =
+        cart.find(function(item) {
+
+            return item.id ===
+                currentProduct.id;
+
+        });
+
+
+    if (existing) {
+
+        existing.quantity += 1;
+
+    } else {
+
+        cart.push({
+
+            id:
+                currentProduct.id,
+
+            name:
+                currentProduct.name,
+
+            price:
+                Number(
+                    currentProduct.price
+                ),
+
+            image_url:
+                currentProduct.image_url,
+
+            quantity:
+                1
+
+        });
+
+    }
+
+
+    localStorage.setItem(
+        "nuvoraCart",
+        JSON.stringify(cart)
+    );
+
+
+    updateCartCount();
+
+
+    document.getElementById(
+        "message"
+    ).textContent =
+        "✓ Product added to cart!";
+
+}
+
+
+
+/* START */
+
+checkUser();
+
+updateCartCount();
+
+loadProduct();
+
+</script>
+
+</body>
+
+</html>

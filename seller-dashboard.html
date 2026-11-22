@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NUVORA - Seller Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    background: #111827;
+    color: white;
+
+    padding: 16px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+}
+
+.logo {
+    color: white;
+    text-decoration: none;
+
+    font-size: 25px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+nav a {
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 15px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+    max-width: 1000px;
+
+    margin: 30px auto;
+
+    padding: 0 18px;
+}
+
+
+/* =========================
+   TOP SECTION
+========================= */
+
+.top-section {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+    gap: 20px;
+}
+
+h1 {
+    font-size: 28px;
+}
+
+.subtitle {
+    color: #666;
+
+    margin-top: 6px;
+}
+
+
+/* =========================
+   TOP BUTTONS
+========================= */
+
+.top-actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+.add-btn,
+.verify-btn {
+    color: white;
+
+    text-decoration: none;
+
+    padding: 13px 18px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    display: inline-block;
+}
+
+.add-btn {
+    background: #111827;
+}
+
+.verify-btn {
+    background: #2563eb;
+}
+
+.add-btn:hover {
+    background: #1f2937;
+}
+
+.verify-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #666;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.06);
+
+    margin-bottom: 20px;
+}
+
+.status h2 {
+    color: #222;
+
+    margin-bottom: 8px;
+}
+
+.status a {
+    display: inline-block;
+
+    background: #111827;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+}
+
+
+/* =========================
+   TOP SELLER PROGRESS
+========================= */
+
+.seller-progress {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.06);
+}
+
+.progress-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.progress-title {
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #111827;
+}
+
+.progress-count {
+    font-size: 14px;
+
+    font-weight: bold;
+
+    color: #666;
+}
+
+
+/* BADGE CIRCLES */
+
+.status-check {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 20px;
+
+    height: 20px;
+
+    min-width: 20px;
+
+    border-radius: 50%;
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    line-height: 1;
+
+    vertical-align: middle;
+}
+
+.blue-check {
+    background: #1877f2;
+}
+
+.gold-check {
+    background: #d4af37;
+}
+
+
+/* PROGRESS BAR */
+
+.progress-track {
+    width: 100%;
+
+    height: 12px;
+
+    background: #e5e7eb;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    margin: 12px 0;
+}
+
+.progress-fill {
+    height: 100%;
+
+    background: #1877f2;
+
+    border-radius: 20px;
+
+    transition: width 0.3s ease;
+}
+
+.progress-fill.gold {
+    background: #d4af37;
+}
+
+
+/* PROGRESS TEXT */
+
+.progress-message {
+    color: #666;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.top-seller-message {
+    color: #8a6d00;
+
+    font-weight: bold;
+
+    font-size: 15px;
+}
+
+
+/* =========================
+   PRODUCTS GRID
+========================= */
+
+.products-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+
+/* =========================
+   PRODUCT CARD
+========================= */
+
+.product-card {
+    background: white;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.08);
+}
+
+.product-image {
+    width: 100%;
+
+    height: 190px;
+
+    object-fit: cover;
+
+    background: #eee;
+
+    display: block;
+}
+
+.product-info {
+    padding: 16px;
+}
+
+.product-name {
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.price {
+    font-size: 19px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.info {
+    font-size: 14px;
+
+    color: #666;
+
+    margin: 5px 0;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+.edit-btn,
+.delete-btn {
+    flex: 1;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #e5e7eb;
+
+    color: #111827;
+}
+
+.delete-btn {
+    background: #fee2e2;
+
+    color: #b91c1c;
+}
+
+.edit-btn:hover {
+    background: #d1d5db;
+}
+
+.delete-btn:hover {
+    background: #fecaca;
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty {
+    background: white;
+
+    padding: 40px 20px;
+
+    text-align: center;
+
+    border-radius: 12px;
+
+    color: #666;
+
+    grid-column: 1 / -1;
+}
+
+.empty h2 {
+    color: #222;
+
+    margin-bottom: 10px;
+}
+
+.empty a {
+    display: inline-block;
+
+    margin-top: 18px;
+
+    background: #111827;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 12px 18px;
+
+    border-radius: 8px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+
+    .products-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    header {
+        padding: 14px 16px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    nav {
+        gap: 9px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .top-section {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .top-actions {
+        width: 100%;
+
+        flex-direction: column;
+    }
+
+    .add-btn,
+    .verify-btn {
+        width: 100%;
+
+        text-align: center;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .progress-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <a
+        href="index.html"
+        class="logo"
+    >
+        NUVORA
+    </a>
+
+
+    <nav>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="products.html">
+            Shop
+        </a>
+
+        <a href="sell.html">
+            Sell
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+
+    <div class="top-section">
+
+        <div>
+
+            <h1>
+                Seller Dashboard
+            </h1>
+
+            <p class="subtitle">
+                Manage your NUVORA products
+            </p>
+
+        </div>
+
+
+        <div class="top-actions">
+
+            <a
+                href="seller-verification.html"
+                class="verify-btn"
+            >
+                ✓ Get Verified
+            </a>
+
+
+            <a
+                href="sell.html"
+                class="add-btn"
+            >
+                + Add Product
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TOP SELLER PROGRESS -->
+
+    <div
+        id="sellerProgress"
+        class="seller-progress"
+    >
+
+        Loading seller status...
+
+    </div>
+
+
+
+    <!-- STATUS -->
+
+    <div
+        id="status"
+        class="status"
+    >
+        Loading your products...
+    </div>
+
+
+
+    <!-- PRODUCTS -->
+
+    <div
+        id="productsGrid"
+        class="products-grid"
+    ></div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+const productsGrid =
+    document.getElementById(
+        "productsGrid"
+    );
+
+
+const sellerProgress =
+    document.getElementById(
+        "sellerProgress"
+    );
+
+
+/* =====================================================
+   CURRENT USER
+===================================================== */
+
+async function getCurrentUser() {
+
+    const {
+        data: {
+            user
+        },
+        error
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (error) {
+
+        console.error(error);
+
+        return null;
+    }
+
+
+    return user;
+
+}
+
+
+/* =====================================================
+   LOAD SELLER STATUS
+===================================================== */
+
+async function loadSellerStatus(userId) {
+
+    sellerProgress.innerHTML =
+        "Loading seller status...";
+
+
+    const {
+        data: seller,
+        error
+    } =
+        await supabaseClient
+            .from("seller_profiles")
+            .select(
+                "display_name, seller_status, total_completed_orders, is_verified"
+            )
+            .eq("id", userId)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Seller status error:",
+            error
+        );
+
+
+        sellerProgress.innerHTML = `
+
+            <div class="progress-title">
+                Seller Status
+            </div>
+
+            <p class="progress-message">
+                Unable to load your seller status.
+            </p>
+
+        `;
+
+        return;
+    }
+
+
+    if (!seller) {
+
+        sellerProgress.innerHTML = `
+
+            <div class="progress-title">
+                Seller Status
+            </div>
+
+            <p class="progress-message">
+                Your seller profile is being prepared.
+            </p>
+
+        `;
+
+        return;
+    }
+
+
+    const completedOrders =
+        Math.max(
+            0,
+            Number(
+                seller.total_completed_orders || 0
+            )
+        );
+
+
+    const isTopSeller =
+        seller.seller_status ===
+        "top_seller";
+
+
+    const isVerified =
+        seller.is_verified === true ||
+        seller.seller_status ===
+        "verified" ||
+        isTopSeller;
+
+
+    /* ---------------------------------------------
+       TOP SELLER
+    --------------------------------------------- */
+
+    if (isTopSeller) {
+
+        sellerProgress.innerHTML = `
+
+            <div class="progress-header">
+
+                <div class="progress-title">
+
+                    Top Seller
+
+                    <span
+                        class="status-check gold-check"
+                        title="Top Seller"
+                        aria-label="Top Seller"
+                    >
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="progress-count">
+                    ${completedOrders} completed orders
+                </div>
+
+            </div>
+
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-fill gold"
+                    style="width:100%;"
+                ></div>
+
+            </div>
+
+
+            <p class="top-seller-message">
+
+                🎉 Congratulations! You have reached
+                Top Seller status.
+
+            </p>
+
+        `;
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       VERIFIED SELLER
+    --------------------------------------------- */
+
+    if (isVerified) {
+
+        const progress =
+            Math.min(
+                100,
+                (completedOrders / 10) * 100
+            );
+
+
+        const remaining =
+            Math.max(
+                0,
+                10 - completedOrders
+            );
+
+
+        sellerProgress.innerHTML = `
+
+            <div class="progress-header">
+
+                <div class="progress-title">
+
+                    Verified Seller
+
+                    <span
+                        class="status-check blue-check"
+                        title="Verified Seller"
+                        aria-label="Verified Seller"
+                    >
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="progress-count">
+
+                    ${completedOrders} / 10 orders
+
+                </div>
+
+            </div>
+
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-fill"
+                    style="width:${progress}%;"
+                ></div>
+
+            </div>
+
+
+            <p class="progress-message">
+
+                ${
+                    remaining === 0
+                    ? "Your Top Seller status is being processed."
+                    : `${remaining} more completed order${remaining === 1 ? "" : "s"} to reach Top Seller status.`
+                }
+
+            </p>
+
+        `;
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       NORMAL SELLER
+    --------------------------------------------- */
+
+    sellerProgress.innerHTML = `
+
+        <div class="progress-header">
+
+            <div class="progress-title">
+                Seller Status
+            </div>
+
+        </div>
+
+
+        <p class="progress-message">
+
+            Become a Verified Seller to start
+            working toward Top Seller status.
+
+        </p>
+
+        <br>
+
+        <a
+            href="seller-verification.html"
+            class="verify-btn"
+        >
+            ✓ Get Verified
+        </a>
+
+    `;
+
+}
+
+
+/* =====================================================
+   LOAD SELLER PRODUCTS
+===================================================== */
+
+async function loadSellerProducts() {
+
+    status.style.display = "block";
+
+    status.innerHTML =
+        "Loading your products...";
+
+    productsGrid.innerHTML = "";
+
+
+    try {
+
+        const user =
+            await getCurrentUser();
+
+
+        /* ---------------------------------------------
+           USER NOT LOGGED IN
+        --------------------------------------------- */
+
+        if (!user) {
+
+            sellerProgress.innerHTML = `
+
+                <div class="progress-title">
+                    Seller Status
+                </div>
+
+                <p class="progress-message">
+                    Please log in to view your seller status.
+                </p>
+
+            `;
+
+
+            status.innerHTML = `
+
+                <h2>
+                    Please log in
+                </h2>
+
+                <p>
+                    You must be logged in to view your seller dashboard.
+                </p>
+
+                <br>
+
+                <a href="login.html">
+                    Log In
+                </a>
+
+            `;
+
+            return;
+        }
+
+
+        /* ---------------------------------------------
+           LOAD SELLER STATUS
+        --------------------------------------------- */
+
+        await loadSellerStatus(
+            user.id
+        );
+
+
+        /* ---------------------------------------------
+           LOAD ONLY THIS USER'S PRODUCTS
+        --------------------------------------------- */
+
+        const {
+            data: products,
+            error
+        } =
+            await supabaseClient
+                .from("products")
+                .select("*")
+                .eq("seller_id", user.id)
+                .order("id", {
+                    ascending: false
+                });
+
+
+        if (error) {
+
+            console.error(error);
+
+            status.innerHTML =
+                "Unable to load your products: " +
+                escapeHtml(error.message);
+
+            return;
+        }
+
+
+        status.style.display = "none";
+
+
+        /* ---------------------------------------------
+           NO PRODUCTS
+        --------------------------------------------- */
+
+        if (
+            !products ||
+            products.length === 0
+        ) {
+
+            productsGrid.innerHTML = `
+
+                <div class="empty">
+
+                    <h2>
+                        No products yet
+                    </h2>
+
+                    <p>
+                        You haven't listed any products yet.
+                    </p>
+
+                    <a href="sell.html">
+                        Add Your First Product
+                    </a>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        /* ---------------------------------------------
+           DISPLAY PRODUCTS
+        --------------------------------------------- */
+
+        products.forEach(
+            function(product) {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "product-card";
+
+
+                card.innerHTML = `
+
+                    <img
+                        class="product-image"
+                        src="${escapeHtml(
+                            product.image_url || ""
+                        )}"
+                        alt="${escapeHtml(
+                            product.name ||
+                            "Product"
+                        )}"
+                        onerror="
+                            this.src='https://via.placeholder.com/500x350?text=NUVORA+Product'
+                        "
+                    >
+
+
+                    <div class="product-info">
+
+
+                        <div class="product-name">
+
+                            ${escapeHtml(
+                                product.name ||
+                                "Unnamed Product"
+                            )}
+
+                        </div>
+
+
+                        <div class="price">
+
+                            ₦${Number(
+                                product.price || 0
+                            ).toLocaleString()}
+
+                        </div>
+
+
+                        <div class="info">
+
+                            Category:
+                            ${escapeHtml(
+                                product.category ||
+                                "N/A"
+                            )}
+
+                        </div>
+
+
+                        <div class="info">
+
+                            Stock:
+                            ${product.stock ?? 0}
+
+                        </div>
+
+
+                        <div class="info">
+
+                            Location:
+
+                            ${escapeHtml(
+                                product.state ||
+                                "N/A"
+                            )}
+
+                            -
+
+                            ${escapeHtml(
+                                product.city ||
+                                "N/A"
+                            )}
+
+                        </div>
+
+
+                        <div class="actions">
+
+
+                            <button
+                                class="edit-btn"
+                                onclick="
+                                    editProduct(
+                                        ${product.id}
+                                    )
+                                "
+                            >
+                                Edit
+                            </button>
+
+
+                            <button
+                                class="delete-btn"
+                                onclick="
+                                    deleteProduct(
+                                        ${product.id}
+                                    )
+                                "
+                            >
+                                Delete
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+                `;
+
+
+                productsGrid.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        status.innerHTML =
+            "Something went wrong while loading your products.";
+
+    }
+
+}
+
+
+/* =====================================================
+   EDIT PRODUCT
+===================================================== */
+
+function editProduct(id) {
+
+    window.location.href =
+        "sell.html?edit=" +
+        encodeURIComponent(id);
+
+}
+
+
+/* =====================================================
+   DELETE PRODUCT
+===================================================== */
+
+async function deleteProduct(id) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this product?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        const user =
+            await getCurrentUser();
+
+
+        if (!user) {
+
+            alert(
+                "Please log in before deleting a product."
+            );
+
+
+            window.location.href =
+                "login.html";
+
+
+            return;
+        }
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("products")
+                .delete()
+                .eq("id", id)
+                .eq("seller_id", user.id);
+
+
+        if (error) {
+
+            console.error(error);
+
+
+            alert(
+                "Unable to delete product: " +
+                error.message
+            );
+
+
+            return;
+        }
+
+
+        alert(
+            "Product deleted successfully."
+        );
+
+
+        await loadSellerProducts();
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Something went wrong while deleting the product."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   HTML ESCAPING
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   START DASHBOARD
+===================================================== */
+
+loadSellerProducts();
+
+</script>
+
+</body>
+
+</html>

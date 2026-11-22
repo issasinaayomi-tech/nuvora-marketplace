@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders - NUVORA</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f8;
+            color: #111827;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+        }
+
+        #orders {
+            display: grid;
+            gap: 18px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fff3e6;
+            color: #c45c00;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .payment {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .items {
+            border-top: 1px solid #eee;
+            padding-top: 14px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-weight: bold;
+        }
+
+        .item-details {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .item-price {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .total {
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .delivery {
+            margin-top: 15px;
+            padding: 13px;
+            background: #f9fafb;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            background: white;
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .empty h2 {
+            margin-bottom: 8px;
+        }
+
+        .empty p {
+            color: #6b7280;
+            margin-bottom: 18px;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            background: #e8790c;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            .item {
+                flex-direction: column;
+            }
+
+            .item-price {
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">NUVORA</div>
+
+    <a href="index.html" class="back">
+        ← Back to Home
+    </a>
+</header>
+
+<main>
+
+    <h1>My Orders</h1>
+
+    <div id="loading">
+        Loading your orders...
+    </div>
+
+    <div id="orders"></div>
+
+</main>
+
+<script>
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+async function loadOrders() {
+
+    const loading =
+        document.getElementById("loading");
+
+    const ordersContainer =
+        document.getElementById("orders");
+
+    const {
+        data: {
+            user
+        }
+    } =
+        await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    const {
+        data: orders,
+        error
+    } =
+        await supabaseClient
+            .from("orders")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", {
+                ascending: false
+            });
+
+
+    if (error) {
+
+        console.error(error);
+
+        loading.style.display =
+            "none";
+
+        ordersContainer.innerHTML = `
+            <div class="error">
+                Could not load your orders.
+                Please try again.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if (!orders || orders.length === 0) {
+
+        loading.style.display =
+            "none";
+
+        ordersContainer.innerHTML = `
+            <div class="empty">
+
+                <h2>No orders yet</h2>
+
+                <p>
+                    Your purchases will appear here.
+                </p>
+
+                <a
+                    href="products.html"
+                    class="shop-btn"
+                >
+                    Start Shopping
+                </a>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    for (const order of orders) {
+
+        const {
+            data: items,
+            error: itemsError
+        } =
+            await supabaseClient
+                .from("order_items")
+                .select("*")
+                .eq("order_id", order.id);
+
+
+        if (itemsError) {
+            console.error(itemsError);
+            continue;
+        }
+
+
+        const date =
+            new Date(
+                order.created_at
+            ).toLocaleString();
+
+
+        let itemsHTML = "";
+
+
+        for (const item of items) {
+
+            const subtotal =
+                Number(item.price) *
+                Number(item.quantity);
+
+
+            itemsHTML += `
+
+                <div class="item">
+
+                    <div>
+
+                        <div class="item-name">
+                            ${escapeHtml(
+                                item.product_name
+                            )}
+                        </div>
+
+                        <div class="item-details">
+                            Quantity:
+                            ${item.quantity}
+                        </div>
+
+                    </div>
+
+                    <div class="item-price">
+                        ₦${subtotal.toLocaleString()}
+                    </div>
+
+                </div>
+
+            `;
+        }
+
+
+        html += `
+
+            <div class="order-card">
+
+                <div class="order-top">
+
+                    <div>
+
+                        <strong>
+                            Order
+                        </strong>
+
+                        <div class="order-id">
+                            ${order.id}
+                        </div>
+
+                    </div>
+
+                    <div class="date">
+                        ${date}
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <span class="status">
+                        ${escapeHtml(
+                            order.order_status ||
+                            "pending"
+                        )}
+                    </span>
+
+                    <div class="payment">
+                        Payment:
+                        ${escapeHtml(
+                            order.payment_status ||
+                            "pending"
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="items">
+
+                    ${itemsHTML}
+
+                </div>
+
+
+                <div class="total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span>
+                        ₦${Number(
+                            order.total_amount
+                        ).toLocaleString()}
+                    </span>
+
+                </div>
+
+
+                <div class="delivery">
+
+                    <strong>
+                        Delivery Information
+                    </strong>
+
+                    <br>
+
+                    ${escapeHtml(
+                        order.customer_name || ""
+                    )}
+
+                    <br>
+
+                    ${escapeHtml(
+                        order.phone || ""
+                    )}
+
+                    <br>
+
+                    ${escapeHtml(
+                        order.address || ""
+                    )}
+
+                    <br>
+
+                    ${escapeHtml(
+                        order.city || ""
+                    )},
+
+                    ${escapeHtml(
+                        order.state || ""
+                    )}
+
+                </div>
+
+            </div>
+
+        `;
+    }
+
+
+    loading.style.display =
+        "none";
+
+    ordersContainer.innerHTML =
+        html;
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+loadOrders();
+</script>
+
+</body>
+</html>

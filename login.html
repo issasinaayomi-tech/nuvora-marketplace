@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUVORA - Log In</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .home-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            margin: 55px auto;
+            padding: 0 20px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #111827;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #111827;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .forgot {
+            display: block;
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 18px;
+            color: #4b5563;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 13px;
+            background: white;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .google-btn:hover {
+            background: #f9fafb;
+        }
+
+        .message {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .signup-text {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14px;
+        }
+
+        .signup-text a {
+            color: #111827;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                margin: 30px auto;
+            }
+
+            .login-box {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">NUVORA</div>
+    <a href="index.html" class="home-link">Home</a>
+</header>
+
+<div class="container">
+
+    <div class="login-box">
+
+        <h1>Welcome Back</h1>
+
+        <p class="subtitle">
+            Log in to your NUVORA account.
+        </p>
+
+        <form id="loginForm">
+
+            <label for="email">Email</label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label for="password">Password</label>
+
+            <div class="password-wrapper">
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    onclick="togglePassword()"
+                >
+                    👁
+                </button>
+
+            </div>
+
+            <a href="#" id="forgotPassword" class="forgot">
+                Forgot password?
+            </a>
+
+            <button
+                type="submit"
+                class="login-btn"
+                id="loginBtn"
+            >
+                Log In
+            </button>
+
+        </form>
+
+        <div class="divider">
+            OR
+        </div>
+
+        <button
+            type="button"
+            class="google-btn"
+            id="googleBtn"
+        >
+            Continue with Google
+        </button>
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+        <div class="signup-text">
+            Don't have an account?
+            <a href="signup.html">Create Account</a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // ==========================================
+    // NUVORA SUPABASE CONNECTION
+    // ==========================================
+
+    const SUPABASE_URL =
+        "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+    const supabaseClient =
+        supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    // ==========================================
+    // PASSWORD SHOW / HIDE
+    // ==========================================
+
+    function togglePassword() {
+
+        const input =
+            document.getElementById("password");
+
+        const button =
+            document.querySelector(".toggle-password");
+
+        if (input.type === "password") {
+
+            input.type = "text";
+            button.textContent = "🙈";
+
+        } else {
+
+            input.type = "password";
+            button.textContent = "👁";
+
+        }
+    }
+
+
+    // ==========================================
+    // EMAIL LOGIN
+    // ==========================================
+
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value;
+
+            const message =
+                document.getElementById("message");
+
+            const loginBtn =
+                document.getElementById("loginBtn");
+
+
+            message.textContent = "";
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Logging in...";
+
+
+            try {
+
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+
+                        email: email,
+
+                        password: password
+
+                    });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                message.style.color = "#16a34a";
+
+                message.textContent =
+                    "Login successful!";
+
+
+                setTimeout(function() {
+
+                    window.location.href =
+                        "index.html";
+
+                }, 800);
+
+
+            } catch (error) {
+
+                message.style.color = "#dc2626";
+
+                message.textContent =
+                    error.message;
+
+
+            } finally {
+
+                loginBtn.disabled = false;
+
+                loginBtn.textContent =
+                    "Log In";
+
+            }
+
+        });
+
+
+    // ==========================================
+    // GOOGLE LOGIN
+    // ==========================================
+
+    document
+        .getElementById("googleBtn")
+        .addEventListener("click", async function() {
+
+            const message =
+                document.getElementById("message");
+
+            try {
+
+                const { error } =
+                    await supabaseClient.auth.signInWithOAuth({
+
+                        provider: "google",
+
+                        options: {
+
+                            redirectTo:
+                                window.location.origin +
+                                "/index.html"
+
+                        }
+
+                    });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+            } catch (error) {
+
+                message.style.color = "#dc2626";
+
+                message.textContent =
+                    error.message;
+
+            }
+
+        });
+
+
+    // ==========================================
+    // FORGOT PASSWORD
+    // ==========================================
+
+    document
+        .getElementById("forgotPassword")
+        .addEventListener("click", async function(event) {
+
+            event.preventDefault();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const message =
+                document.getElementById("message");
+
+
+            if (!email) {
+
+                message.style.color = "#dc2626";
+
+                message.textContent =
+                    "Enter your email first.";
+
+                return;
+
+            }
+
+
+            try {
+
+                const { error } =
+                    await supabaseClient.auth
+                        .resetPasswordForEmail(email, {
+
+                            redirectTo:
+                                window.location.origin +
+                                "/reset-password.html"
+
+                        });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                message.style.color = "#16a34a";
+
+                message.textContent =
+                    "Password reset email sent. Check your inbox.";
+
+
+            } catch (error) {
+
+                message.style.color = "#dc2626";
+
+                message.textContent =
+                    error.message;
+
+            }
+
+        });
+
+</script>
+
+</body>
+</html>

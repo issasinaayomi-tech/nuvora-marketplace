@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NUVORA - Messages</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+header {
+    background: #111;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.page {
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.status {
+    background: #ffe5e5;
+    color: #a00000;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.messages-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 15px;
+    min-height: 650px;
+}
+
+.conversations {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+.conversations h2 {
+    margin-bottom: 15px;
+}
+
+.conversation {
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border: 1px solid #eee;
+}
+
+.conversation:hover {
+    background: #f7f7f7;
+}
+
+.conversation.active {
+    background: #fff0dc;
+    border-color: #e8790c;
+}
+
+.conversation-name {
+    font-weight: bold;
+}
+
+.conversation-product {
+    color: #666;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.chat {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    min-height: 650px;
+}
+
+.chat-header {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-name {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.chat-product {
+    color: #666;
+    margin-top: 4px;
+}
+
+.offer-button {
+    margin-top: 12px;
+    background: #e8790c;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.offer-button:hover {
+    opacity: 0.9;
+}
+
+.messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.message.mine {
+    justify-content: flex-end;
+}
+
+.bubble {
+    background: #eee;
+    padding: 10px 13px;
+    border-radius: 12px;
+    max-width: 75%;
+    word-wrap: break-word;
+}
+
+.message.mine .bubble {
+    background: #e8790c;
+    color: white;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.65;
+    margin-top: 6px;
+}
+
+.message-form {
+    display: flex;
+    gap: 8px;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.message-form input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.message-form button {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.message-form button:disabled {
+    opacity: 0.6;
+}
+
+.empty {
+    color: #777;
+    text-align: center;
+    padding: 30px 10px;
+}
+
+
+/* OFFER CARD */
+
+.offer-message {
+    justify-content: center;
+}
+
+.offer-card {
+    width: min(380px, 90%);
+    background: #fff8ed;
+    border: 2px solid #e8790c;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+}
+
+.offer-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.offer-amount {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.offer-status {
+    margin-bottom: 12px;
+    color: #555;
+}
+
+.offer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.offer-actions button {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.accept-offer {
+    background: #168a45;
+    color: white;
+}
+
+.reject-offer {
+    background: #c62828;
+    color: white;
+}
+
+.counter-offer {
+    background: #111;
+    color: white;
+}
+
+.buy-agreed {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #168a45;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.buy-agreed:hover {
+    opacity: 0.9;
+}
+
+
+/* MODAL */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.offer-modal {
+    width: min(420px, 100%);
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.offer-modal h2 {
+    margin-bottom: 8px;
+}
+
+.offer-modal-product {
+    color: #666;
+    margin-bottom: 18px;
+}
+
+.listed-price {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.offer-modal label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.offer-modal input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cancel-modal {
+    background: #eee;
+    color: #222;
+}
+
+.send-offer-modal {
+    background: #e8790c;
+    color: white;
+}
+
+@media (max-width: 750px) {
+
+    .messages-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .conversations {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .chat {
+        min-height: 600px;
+    }
+
+    .messages {
+        max-height: 450px;
+    }
+
+    .message-form {
+        flex-direction: column;
+    }
+
+    .message-form button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        NUVORA
+    </div>
+
+    <nav>
+
+        <a href="index.html">Home</a>
+
+        <a href="products.html">Shop</a>
+
+        <a href="sell.html">Sell</a>
+
+        <a href="profile.html">Profile</a>
+
+    </nav>
+
+</header>
+
+
+<div class="page">
+
+    <div
+        id="status"
+        class="status"
+    ></div>
+
+
+    <div class="messages-layout">
+
+
+        <!-- CONVERSATIONS -->
+
+        <div class="conversations">
+
+            <h2>
+                Messages
+            </h2>
+
+            <div
+                id="conversationList"
+            >
+                <div class="empty">
+                    Loading conversations...
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- CHAT -->
+
+        <div class="chat">
+
+            <div
+                id="chatHeader"
+                class="chat-header"
+            >
+
+                <div class="chat-name">
+                    Select a conversation
+                </div>
+
+                <div class="chat-product">
+                    Your messages will appear here.
+                </div>
+
+            </div>
+
+
+            <div
+                id="messages"
+                class="messages"
+            >
+
+                <div class="empty">
+                    Select a conversation to start chatting.
+                </div>
+
+            </div>
+
+
+            <form
+                id="messageForm"
+                class="message-form"
+            >
+
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Type a message..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="submit"
+                    id="sendButton"
+                >
+                    Send
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MAKE OFFER MODAL -->
+
+<div
+    id="offerModalOverlay"
+    class="modal-overlay"
+>
+
+    <div
+        class="offer-modal"
+    >
+
+        <h2>
+            💰 Make an Offer
+        </h2>
+
+        <div
+            id="offerModalProduct"
+            class="offer-modal-product"
+        >
+            Product
+        </div>
+
+        <div
+            id="listedPrice"
+            class="listed-price"
+        >
+            Listed price: ₦0
+        </div>
+
+        <label for="offerAmount">
+            Your offer
+        </label>
+
+        <input
+            type="number"
+            id="offerAmount"
+            min="1"
+            step="1"
+            placeholder="Enter amount"
+        >
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="cancel-modal"
+                id="cancelOfferButton"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                class="send-offer-modal"
+                id="sendOfferButton"
+            >
+                Send Offer
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* SUPABASE */
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* STATE */
+
+let currentUser = null;
+
+let currentConversation = null;
+
+let conversations = [];
+
+let offerProduct = null;
+
+let offerSellerId = null;
+
+
+/* URL */
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const requestedConversationId =
+    urlParams.get(
+        "conversation"
+    );
+
+
+/* ESCAPE HTML */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* SHOW ERROR */
+
+function showError(message) {
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+    status.textContent =
+        message;
+
+    status.style.display =
+        "block";
+
+}
+
+
+/* HIDE ERROR */
+
+function hideError() {
+
+    document.getElementById(
+        "status"
+    ).style.display =
+        "none";
+
+}
+
+
+/* GET CURRENT USER */
+
+async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+    if (error) {
+
+        console.error(
+            "Session error:",
+            error
+        );
+
+        showError(
+            "Unable to check your login session."
+        );
+
+        return null;
+
+    }
+
+    if (
+        !data ||
+        !data.session ||
+        !data.session.user
+    ) {
+
+        return null;
+
+    }
+
+    return data.session.user;
+
+}
+
+
+/* GET PRODUCT */
+
+async function getProduct(productId) {
+
+    if (!productId) {
+
+        return null;
+
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .select(
+                "id, name, price, seller_id"
+            )
+            .eq(
+                "id",
+                productId
+            )
+            .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            "Product error:",
+            error
+        );
+
+        return null;
+
+    }
+
+    return data;
+
+}
+
+
+/* GET PRODUCT NAME */
+
+async function getProductName(productId) {
+
+    const product =
+        await getProduct(
+            productId
+        );
+
+    return product?.name ||
+        "Product";
+
+}
+
+
+/* LOAD CONVERSATIONS */
+
+async function loadConversations() {
+
+    const list =
+        document.getElementById(
+            "conversationList"
+        );
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("conversations")
+            .select("*")
+            .or(
+                "buyer_id.eq." +
+                currentUser.id +
+                ",seller_id.eq." +
+                currentUser.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            "Conversation error:",
+            error
+        );
+
+        alert(
+            "Conversation error: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+    conversations =
+        data || [];
+
+    if (
+        conversations.length === 0
+    ) {
+
+        list.innerHTML = `
+            <div class="empty">
+                No conversations yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    list.innerHTML = "";
+
+
+    for (
+        const conversation
+        of conversations
+    ) {
+
+        const otherUserId =
+            conversation.buyer_id ===
+            currentUser.id
+
+                ? conversation.seller_id
+
+                : conversation.buyer_id;
+
+
+        const productName =
+            await getProductName(
+                conversation.product_id
+            );
+
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+
+        item.className =
+            "conversation";
+
+
+        if (
+            requestedConversationId &&
+            conversation.id ===
+            requestedConversationId
+        ) {
+
+            item.classList.add(
+                "active"
+            );
+
+        }
+
+
+        item.innerHTML = `
+
+            <div class="conversation-name">
+                Conversation
+            </div>
+
+            <div class="conversation-product">
+                ${escapeHTML(productName)}
+            </div>
+
+        `;
+
+
+        item.addEventListener(
+            "click",
+            async function() {
+
+                await openConversation(
+                    conversation,
+                    otherUserId,
+                    productName,
+                    item
+                );
+
+            }
+        );
+
+
+        list.appendChild(
+            item
+        );
+
+    }
+
+
+    if (
+        requestedConversationId
+    ) {
+
+        const conversation =
+            conversations.find(
+                function(item) {
+
+                    return item.id ===
+                        requestedConversationId;
+
+                }
+            );
+
+
+        if (conversation) {
+
+            const otherUserId =
+                conversation.buyer_id ===
+                currentUser.id
+
+                    ? conversation.seller_id
+
+                    : conversation.buyer_id;
+
+
+            const productName =
+                await getProductName(
+                    conversation.product_id
+                );
+
+
+            const selectedItem =
+                Array.from(
+                    document.querySelectorAll(
+                        ".conversation"
+                    )
+                ).find(
+                    function(item) {
+
+                        return item.classList.contains(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+            await openConversation(
+                conversation,
+                otherUserId,
+                productName,
+                selectedItem
+            );
+
+        }
+
+    }
+
+}
+
+
+/* OPEN CONVERSATION */
+
+async function openConversation(
+    conversation,
+    otherUserId,
+    productName,
+    selectedItem
+) {
+
+    currentConversation =
+        conversation;
+
+
+    hideError();
+
+
+    document
+        .querySelectorAll(
+            ".conversation"
+        )
+        .forEach(
+            function(item) {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    if (selectedItem) {
+
+        selectedItem.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document.getElementById(
+        "chatHeader"
+    ).innerHTML = `
+
+        <div class="chat-name">
+            Chat
+        </div>
+
+        <div class="chat-product">
+            ${escapeHTML(productName)}
+        </div>
+
+        <button
+            type="button"
+            class="offer-button"
+            id="makeOfferButton"
+        >
+            💰 Make Offer
+        </button>
+
+    `;
+
+
+    document
+        .getElementById(
+            "makeOfferButton"
+        )
+        .addEventListener(
+            "click",
+            function() {
+
+                openOfferModal(
+                    conversation.product_id,
+                    otherUserId
+                );
+
+            }
+        );
+
+
+    await loadMessages();
+
+}
+
+
+/* LOAD MESSAGES + OFFERS */
+
+async function loadMessages() {
+
+    const messageBox =
+        document.getElementById(
+            "messages"
+        );
+
+
+    if (!currentConversation) {
+
+        return;
+
+    }
+
+
+    const productId =
+        currentConversation.product_id;
+
+
+    const otherUserId =
+        currentConversation.buyer_id ===
+        currentUser.id
+
+            ? currentConversation.seller_id
+
+            : currentConversation.buyer_id;
+
+
+    /* MESSAGES */
+
+    const {
+        data: sentMessages,
+        error: sentError
+    } =
+        await supabaseClient
+            .from("messages")
+            .select("*")
+            .eq(
+                "product_id",
+                productId
+            )
+            .eq(
+                "sender_id",
+                currentUser.id
+            )
+            .eq(
+                "receiver_id",
+                otherUserId
+            );
+
+
+    const {
+        data: receivedMessages,
+        error: receivedError
+    } =
+        await supabaseClient
+            .from("messages")
+            .select("*")
+            .eq(
+                "product_id",
+                productId
+            )
+            .eq(
+                "sender_id",
+                otherUserId
+            )
+            .eq(
+                "receiver_id",
+                currentUser.id
+            );
+
+
+    /* OFFERS */
+
+    const {
+        data: offers,
+        error: offersError
+    } =
+        await supabaseClient
+            .from("offers")
+            .select("*")
+            .eq(
+                "product_id",
+                productId
+            )
+            .or(
+                "buyer_id.eq." +
+                currentUser.id +
+                ",seller_id.eq." +
+                currentUser.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (
+        sentError ||
+        receivedError ||
+        offersError
+    ) {
+
+        console.error(
+            sentError ||
+            receivedError ||
+            offersError
+        );
+
+        showError(
+            "Unable to load conversation."
+        );
+
+        return;
+
+    }
+
+
+    const chatItems = [];
+
+
+    (sentMessages || [])
+        .forEach(
+            function(message) {
+
+                chatItems.push({
+
+                    type: "message",
+
+                    data: message
+
+                });
+
+            }
+        );
+
+
+    (receivedMessages || [])
+        .forEach(
+            function(message) {
+
+                chatItems.push({
+
+                    type: "message",
+
+                    data: message
+
+                });
+
+            }
+        );
+
+
+    (offers || [])
+        .forEach(
+            function(offer) {
+
+                chatItems.push({
+
+                    type: "offer",
+
+                    data: offer
+
+                });
+
+            }
+        );
+
+
+    chatItems.sort(
+        function(a, b) {
+
+            return new Date(
+                a.data.created_at
+            ) -
+            new Date(
+                b.data.created_at
+            );
+
+        }
+    );
+
+
+    if (
+        chatItems.length === 0
+    ) {
+
+        messageBox.innerHTML = `
+            <div class="empty">
+                No messages yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    messageBox.innerHTML =
+        chatItems.map(
+            function(item) {
+
+
+                /* MESSAGE */
+
+                if (
+                    item.type ===
+                    "message"
+                ) {
+
+                    const message =
+                        item.data;
+
+
+                    const mine =
+                        message.sender_id ===
+                        currentUser.id;
+
+
+                    const time =
+                        new Date(
+                            message.created_at
+                        ).toLocaleString();
+
+
+                    return `
+
+                        <div
+                            class="message
+                            ${mine ? "mine" : ""}"
+                        >
+
+                            <div class="bubble">
+
+                                ${escapeHTML(
+                                    message.message
+                                )}
+
+                                <div
+                                    class="message-time"
+                                >
+                                    ${escapeHTML(time)}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* OFFER */
+
+                const offer =
+                    item.data;
+
+
+                const isSeller =
+                    currentUser.id ===
+                    offer.seller_id;
+
+
+                const isBuyer =
+                    currentUser.id ===
+                    offer.buyer_id;
+
+
+                const amount =
+                    Number(
+                        offer.amount
+                    ).toLocaleString();
+
+
+                const status =
+                    offer.status ||
+                    "pending";
+
+
+                const time =
+                    new Date(
+                        offer.created_at
+                    ).toLocaleString();
+
+
+                let buttons = "";
+
+
+                /* SELLER CONTROLS */
+
+                if (
+                    isSeller &&
+                    status ===
+                    "pending"
+                ) {
+
+                    buttons = `
+
+                        <div class="offer-actions">
+
+                            <button
+                                type="button"
+                                class="accept-offer"
+                                onclick="acceptOffer('${offer.id}')"
+                            >
+                                Accept
+                            </button>
+
+                            <button
+                                type="button"
+                                class="reject-offer"
+                                onclick="rejectOffer('${offer.id}')"
+                            >
+                                Reject
+                            </button>
+
+                            <button
+                                type="button"
+                                class="counter-offer"
+                                onclick="counterOffer('${offer.id}')"
+                            >
+                                Counter
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* BUYER PAYMENT BUTTON */
+
+                if (
+                    isBuyer &&
+                    status ===
+                    "accepted"
+                ) {
+
+                    buttons = `
+
+                        <button
+                            type="button"
+                            class="buy-agreed"
+                            onclick="buyAcceptedOffer('${offer.id}')"
+                        >
+                            🛒 Buy at ₦${escapeHTML(amount)}
+                        </button>
+
+                    `;
+
+                }
+
+
+                return `
+
+                    <div
+                        class="message offer-message"
+                    >
+
+                        <div
+                            class="offer-card"
+                        >
+
+                            <div
+                                class="offer-title"
+                            >
+                                💰 Offer
+                            </div>
+
+                            <div
+                                class="offer-amount"
+                            >
+                                ₦${escapeHTML(amount)}
+                            </div>
+
+                            <div
+                                class="offer-status"
+                            >
+
+                                Status:
+                                <strong>
+                                    ${escapeHTML(status)}
+                                </strong>
+
+                            </div>
+
+                            ${buttons}
+
+                            <div
+                                class="message-time"
+                            >
+                                ${escapeHTML(time)}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
+
+
+    messageBox.scrollTop =
+        messageBox.scrollHeight;
+
+}
+
+
+/* SEND MESSAGE */
+
+document
+    .getElementById(
+        "messageForm"
+    )
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            hideError();
+
+
+            if (!currentConversation) {
+
+                showError(
+                    "Select a conversation first."
+                );
+
+                return;
+
+            }
+
+
+            const input =
+                document.getElementById(
+                    "messageInput"
+                );
+
+
+            const text =
+                input.value.trim();
+
+
+            if (!text) {
+
+                return;
+
+            }
+
+
+            const sendButton =
+                document.getElementById(
+                    "sendButton"
+                );
+
+
+            sendButton.disabled =
+                true;
+
+
+            sendButton.textContent =
+                "Sending...";
+
+
+            const receiverId =
+                currentConversation.buyer_id ===
+                currentUser.id
+
+                    ? currentConversation.seller_id
+
+                    : currentConversation.buyer_id;
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("messages")
+                    .insert({
+
+                        sender_id:
+                            currentUser.id,
+
+                        receiver_id:
+                            receiverId,
+
+                        product_id:
+                            currentConversation.product_id,
+
+                        message:
+                            text
+
+                    });
+
+
+            sendButton.disabled =
+                false;
+
+
+            sendButton.textContent =
+                "Send";
+
+
+            if (error) {
+
+                console.error(
+                    "Send message error:",
+                    error
+                );
+
+                showError(
+                    "Message could not be sent."
+                );
+
+                return;
+
+            }
+
+
+            input.value = "";
+
+
+            await loadMessages();
+
+        }
+    );
+
+
+/* OPEN OFFER MODAL */
+
+async function openOfferModal(
+    productId,
+    sellerId
+) {
+
+    hideError();
+
+
+    const product =
+        await getProduct(
+            productId
+        );
+
+
+    if (!product) {
+
+        showError(
+            "Product could not be found."
+        );
+
+        return;
+
+    }
+
+
+    offerProduct =
+        product;
+
+
+    offerSellerId =
+        sellerId;
+
+
+    document.getElementById(
+        "offerModalProduct"
+    ).textContent =
+        product.name;
+
+
+    document.getElementById(
+        "listedPrice"
+    ).textContent =
+        "Listed price: ₦" +
+        Number(
+            product.price
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "offerAmount"
+    ).value = "";
+
+
+    document
+        .getElementById(
+            "offerModalOverlay"
+        )
+        .classList.add(
+            "show"
+        );
+
+
+    document.getElementById(
+        "offerAmount"
+    ).focus();
+
+}
+
+
+/* CLOSE OFFER MODAL */
+
+function closeOfferModal() {
+
+    document
+        .getElementById(
+            "offerModalOverlay"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    offerProduct =
+        null;
+
+
+    offerSellerId =
+        null;
+
+}
+
+
+/* CANCEL OFFER */
+
+document
+    .getElementById(
+        "cancelOfferButton"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            closeOfferModal();
+
+        }
+    );
+
+
+/* SEND OFFER FROM MODAL */
+
+document
+    .getElementById(
+        "sendOfferButton"
+    )
+    .addEventListener(
+        "click",
+        async function() {
+
+            hideError();
+
+
+            if (
+                !offerProduct ||
+                !offerSellerId
+            ) {
+
+                showError(
+                    "Offer information is missing."
+                );
+
+                return;
+
+            }
+
+
+            const amountInput =
+                document.getElementById(
+                    "offerAmount"
+                );
+
+
+            const amount =
+                Number(
+                    amountInput.value
+                );
+
+
+            if (
+                !Number.isFinite(amount) ||
+                amount <= 0
+            ) {
+
+                showError(
+                    "Please enter a valid offer amount."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                amount >=
+                Number(
+                    offerProduct.price
+                )
+            ) {
+
+                const continueOffer =
+                    confirm(
+                        "Your offer is equal to or higher than the listed price. Send it anyway?"
+                    );
+
+
+                if (!continueOffer) {
+
+                    return;
+
+                }
+
+            }
+
+
+            const button =
+                document.getElementById(
+                    "sendOfferButton"
+                );
+
+
+            button.disabled =
+                true;
+
+
+            button.textContent =
+                "Sending...";
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("offers")
+                    .insert({
+
+                        product_id:
+                            offerProduct.id,
+
+                        buyer_id:
+                            currentUser.id,
+
+                        seller_id:
+                            offerSellerId,
+
+                        amount:
+                            amount,
+
+                        status:
+                            "pending"
+
+                    });
+
+
+            button.disabled =
+                false;
+
+
+            button.textContent =
+                "Send Offer";
+
+
+            if (error) {
+
+                console.error(
+                    "Offer error:",
+                    error
+                );
+
+                showError(
+                    "Offer could not be sent."
+                );
+
+                return;
+
+            }
+
+
+            closeOfferModal();
+
+
+            await loadMessages();
+
+        }
+    );
+
+
+/* ACCEPT OFFER */
+
+async function acceptOffer(
+    offerId
+) {
+
+    const confirmed =
+        confirm(
+            "Accept this offer?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("offers")
+            .update({
+
+                status:
+                    "accepted"
+
+            })
+            .eq(
+                "id",
+                offerId
+            )
+            .eq(
+                "seller_id",
+                currentUser.id
+            )
+            .eq(
+                "status",
+                "pending"
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Accept offer error:",
+            error
+        );
+
+        showError(
+            "Offer could not be accepted."
+        );
+
+        return;
+
+    }
+
+
+    await loadMessages();
+
+}
+
+
+/* REJECT OFFER */
+
+async function rejectOffer(
+    offerId
+) {
+
+    const confirmed =
+        confirm(
+            "Reject this offer?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("offers")
+            .update({
+
+                status:
+                    "rejected"
+
+            })
+            .eq(
+                "id",
+                offerId
+            )
+            .eq(
+                "seller_id",
+                currentUser.id
+            )
+            .eq(
+                "status",
+                "pending"
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Reject offer error:",
+            error
+        );
+
+        showError(
+            "Offer could not be rejected."
+        );
+
+        return;
+
+    }
+
+
+    await loadMessages();
+
+}
+
+
+/* COUNTER OFFER */
+
+async function counterOffer(
+    offerId
+) {
+
+    const {
+        data: originalOffer,
+        error: fetchError
+    } =
+        await supabaseClient
+            .from("offers")
+            .select("*")
+            .eq(
+                "id",
+                offerId
+            )
+            .eq(
+                "seller_id",
+                currentUser.id
+            )
+            .eq(
+                "status",
+                "pending"
+            )
+            .maybeSingle();
+
+
+    if (
+        fetchError ||
+        !originalOffer
+    ) {
+
+        console.error(
+            "Counter offer error:",
+            fetchError
+        );
+
+        showError(
+            "Original offer could not be found."
+        );
+
+        return;
+
+    }
+
+
+    const amountText =
+        prompt(
+            "Enter your counter offer amount in ₦:"
+        );
+
+
+    if (!amountText) {
+
+        return;
+
+    }
+
+
+    const amount =
+        Number(
+            amountText.replace(
+                /,/g,
+                ""
+            )
+        );
+
+
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        showError(
+            "Please enter a valid counter offer."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error: rejectError
+    } =
+        await supabaseClient
+            .from("offers")
+            .update({
+
+                status:
+                    "rejected"
+
+            })
+            .eq(
+                "id",
+                offerId
+            )
+            .eq(
+                "seller_id",
+                currentUser.id
+            )
+            .eq(
+                "status",
+                "pending"
+            );
+
+
+    if (rejectError) {
+
+        console.error(
+            "Counter update error:",
+            rejectError
+        );
+
+        showError(
+            "Could not update the original offer."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error: newOfferError
+    } =
+        await supabaseClient
+            .from("offers")
+            .insert({
+
+                product_id:
+                    originalOffer.product_id,
+
+                buyer_id:
+                    originalOffer.buyer_id,
+
+                seller_id:
+                    currentUser.id,
+
+                amount:
+                    amount,
+
+                status:
+                    "pending"
+
+            });
+
+
+    if (newOfferError) {
+
+        console.error(
+            "Counter offer creation error:",
+            newOfferError
+        );
+
+        showError(
+            "Counter offer could not be sent."
+        );
+
+        return;
+
+    }
+
+
+    await loadMessages();
+
+}
+
+
+/* BUY ACCEPTED OFFER */
+
+async function buyAcceptedOffer(
+    offerId
+) {
+
+    const {
+        data: offer,
+        error
+    } =
+        await supabaseClient
+            .from("offers")
+            .select("*")
+            .eq(
+                "id",
+                offerId
+            )
+            .eq(
+                "buyer_id",
+                currentUser.id
+            )
+            .eq(
+                "status",
+                "accepted"
+            )
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Accepted offer error:",
+            error
+        );
+
+        showError(
+            "Unable to load this accepted offer."
+        );
+
+        return;
+
+    }
+
+
+    if (!offer) {
+
+        showError(
+            "This offer is no longer available."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Save the exact accepted offer.
+       Checkout will use this later.
+    */
+
+    sessionStorage.setItem(
+        "nuvoraAcceptedOffer",
+        JSON.stringify({
+            offer_id:
+                offer.id,
+
+            product_id:
+                offer.product_id,
+
+            seller_id:
+                offer.seller_id,
+
+            buyer_id:
+                offer.buyer_id,
+
+            amount:
+                Number(
+                    offer.amount
+                )
+        })
+    );
+
+
+    window.location.href =
+        "checkout.html";
+
+}
+
+
+/* CLOSE MODAL WHEN CLICKING OUTSIDE */
+
+document
+    .getElementById(
+        "offerModalOverlay"
+    )
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                this
+            ) {
+
+                closeOfferModal();
+
+            }
+
+        }
+    );
+
+
+/* START */
+
+async function start() {
+
+    hideError();
+
+
+    currentUser =
+        await getCurrentUser();
+
+
+    if (!currentUser) {
+
+        alert(
+            "NUVORA: You are not logged in on this page."
+        );
+
+
+        window.location.href =
+            "login.html";
+
+
+        return;
+
+    }
+
+
+    await loadConversations();
+
+}
+
+
+start();
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NUVORA Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 18px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.admin-label {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.container {
+    width: 92%;
+    max-width: 1100px;
+    margin: 30px auto;
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+.message {
+    display: none;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* DASHBOARD */
+
+.dashboard {
+    display: grid;
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 35px;
+}
+
+.stat-card {
+    background: white;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    padding: 20px;
+}
+
+.stat-icon {
+    font-size: 25px;
+    margin-bottom: 12px;
+}
+
+.stat-title {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.stat-value {
+    font-size: 25px;
+    font-weight: bold;
+    color: #172033;
+}
+
+
+/* SECTION */
+
+.section-title {
+    margin-bottom: 8px;
+}
+
+.section-subtitle {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+
+/* LOADING */
+
+.loading {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+}
+
+
+/* REQUEST / ORDER CARD */
+
+.request {
+    background: white;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    margin-bottom: 18px;
+}
+
+.request-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.request-header h2 {
+    font-size: 19px;
+}
+
+.status {
+    background: #fef3c7;
+
+    color: #92400e;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    height: fit-content;
+}
+
+.info {
+    line-height: 1.8;
+
+    color: #475569;
+}
+
+.info strong {
+    color: #172033;
+}
+
+.note {
+    background: #f8fafc;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    margin-top: 12px;
+}
+
+.actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 18px;
+
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+
+    padding: 12px 18px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    font-size: 14px;
+}
+
+.approve {
+    background: #16a34a;
+
+    color: white;
+}
+
+.reject {
+    background: #dc2626;
+
+    color: white;
+}
+
+.search-button {
+    background: #2563eb;
+    color: white;
+}
+
+.clear-button {
+    background: #64748b;
+    color: white;
+}
+
+.details-button {
+    background: #111827;
+    color: white;
+}
+
+.close-button {
+    background: #64748b;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+.empty {
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #64748b;
+}
+
+
+/* ORDER SEARCH */
+
+.order-search {
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    flex-wrap: wrap;
+}
+
+.order-search input {
+    flex: 1;
+
+    min-width: 240px;
+
+    padding: 13px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.order-search input:focus {
+    border-color: #2563eb;
+}
+
+
+/* ORDER DETAILS MODAL */
+
+.modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.65);
+
+    z-index: 1000;
+
+    padding: 20px;
+
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: white;
+
+    width: 100%;
+
+    max-width: 750px;
+
+    margin: 40px auto;
+
+    border-radius: 14px;
+
+    padding: 25px;
+
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 21px;
+}
+
+.modal-close {
+    background: #e2e8f0;
+
+    color: #172033;
+
+    padding: 8px 12px;
+}
+
+.detail-section {
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    padding: 16px;
+
+    margin-bottom: 15px;
+}
+
+.detail-section h3 {
+    margin-bottom: 12px;
+
+    font-size: 16px;
+}
+
+.detail-row {
+    line-height: 1.8;
+
+    color: #475569;
+}
+
+.detail-row strong {
+    color: #172033;
+}
+
+.order-item {
+    background: #f8fafc;
+
+    border-radius: 9px;
+
+    padding: 13px;
+
+    margin-top: 10px;
+}
+
+.order-item-name {
+    font-weight: bold;
+
+    color: #172033;
+
+    margin-bottom: 6px;
+}
+
+.order-item-info {
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+.order-total {
+    font-size: 19px;
+
+    font-weight: bold;
+
+    color: #172033;
+
+    margin-top: 12px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+    .dashboard {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+    .container {
+        width: 94%;
+    }
+
+    .dashboard {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .request-header {
+        flex-direction: column;
+    }
+
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-content {
+        margin: 20px auto;
+
+        padding: 18px;
+    }
+
+}
+
+@media (max-width: 380px) {
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        NUVORA
+    </div>
+
+    <div class="admin-label">
+        Admin Center
+    </div>
+
+</header>
+
+
+<div class="container">
+
+
+<h1>
+    Admin Dashboard
+</h1>
+
+
+<p class="subtitle">
+    Manage NUVORA marketplace operations.
+</p>
+
+
+<div
+    id="message"
+    class="message"
+></div>
+
+
+<!-- DASHBOARD -->
+
+<div
+    id="dashboard"
+    class="dashboard"
+>
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            👥
+        </div>
+
+        <div class="stat-title">
+            Total Users
+        </div>
+
+        <div
+            id="totalUsers"
+            class="stat-value"
+        >
+            —
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            🛍️
+        </div>
+
+        <div class="stat-title">
+            Products
+        </div>
+
+        <div
+            id="totalProducts"
+            class="stat-value"
+        >
+            —
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📦
+        </div>
+
+        <div class="stat-title">
+            Orders
+        </div>
+
+        <div
+            id="totalOrders"
+            class="stat-value"
+        >
+            —
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            💰
+        </div>
+
+        <div class="stat-title">
+            Paid Sales
+        </div>
+
+        <div
+            id="totalSales"
+            class="stat-value"
+        >
+            —
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ⏳
+        </div>
+
+        <div class="stat-title">
+            Pending Verification
+        </div>
+
+        <div
+            id="pendingVerifications"
+            class="stat-value"
+        >
+            —
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SELLER VERIFICATION -->
+
+<h2 class="section-title">
+    Seller Verification
+</h2>
+
+
+<p class="section-subtitle">
+    Review pending seller verification requests.
+</p>
+
+
+<div id="requests">
+
+    <div class="loading">
+        Loading verification requests...
+    </div>
+
+</div>
+
+
+<!-- ORDERS MANAGEMENT -->
+
+<h2
+    class="section-title"
+    style="margin-top:40px;"
+>
+    Orders Management
+</h2>
+
+
+<p class="section-subtitle">
+    Search and manage NUVORA customer orders.
+</p>
+
+
+<div class="order-search">
+
+    <input
+        type="text"
+        id="orderSearch"
+        placeholder="Search customer name, phone, order ID or payment reference..."
+    >
+
+
+    <button
+        type="button"
+        id="searchOrdersBtn"
+        class="search-button"
+    >
+        🔎 Search
+    </button>
+
+
+    <button
+        type="button"
+        id="clearOrdersBtn"
+        class="clear-button"
+    >
+        Clear
+    </button>
+
+</div>
+
+
+<div id="adminOrders">
+
+    <div class="loading">
+        Loading orders...
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- ORDER DETAILS MODAL -->
+
+<div
+    id="orderDetailsModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                Order Details
+            </h2>
+
+            <button
+                type="button"
+                id="closeOrderModal"
+                class="modal-close"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div id="orderDetailsContent">
+
+            <div class="loading">
+                Loading order details...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* SUPABASE */
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* ELEMENTS */
+
+const requestsBox =
+    document.getElementById(
+        "requests"
+    );
+
+
+const messageBox =
+    document.getElementById(
+        "message"
+    );
+
+
+const orderDetailsModal =
+    document.getElementById(
+        "orderDetailsModal"
+    );
+
+
+const orderDetailsContent =
+    document.getElementById(
+        "orderDetailsContent"
+    );
+
+
+/* MESSAGE */
+
+function showMessage(
+    text,
+    type
+) {
+
+    messageBox.textContent =
+        text;
+
+    messageBox.className =
+        "message " + type;
+
+    messageBox.style.display =
+        "block";
+
+}
+
+
+/* ESCAPE HTML */
+
+function escapeHTML(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* CHECK ADMIN */
+
+async function checkAdmin() {
+
+    const {
+        data: { user },
+        error
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        error ||
+        !user
+    ) {
+
+        document.body.innerHTML = `
+
+            <div style="
+                padding:40px;
+                text-align:center;
+                font-family:Arial;
+            ">
+
+                <h2>
+                    Please log in first.
+                </h2>
+
+                <p style="
+                    margin-top:10px;
+                ">
+
+                    <a href="login.html">
+                        Go to Login
+                    </a>
+
+                </p>
+
+            </div>
+
+        `;
+
+        return false;
+
+    }
+
+
+    const {
+        data: admin,
+        error: adminError
+    } =
+        await supabaseClient
+
+            .from("admin_users")
+
+            .select("user_id")
+
+            .eq(
+                "user_id",
+                user.id
+            )
+
+            .maybeSingle();
+
+
+    if (
+        adminError ||
+        !admin
+    ) {
+
+        document.body.innerHTML = `
+
+            <div style="
+                padding:40px;
+                text-align:center;
+                font-family:Arial;
+            ">
+
+                <h2>
+                    Access denied
+                </h2>
+
+                <p style="
+                    margin-top:10px;
+                ">
+
+                    This account is not
+                    a NUVORA administrator.
+
+                </p>
+
+            </div>
+
+        `;
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* LOAD DASHBOARD */
+
+async function loadDashboardStats() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .rpc(
+                "get_admin_dashboard_stats"
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Could not load dashboard: " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "totalUsers"
+    ).textContent =
+        Number(
+            data.total_users || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "totalProducts"
+    ).textContent =
+        Number(
+            data.total_products || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "totalOrders"
+    ).textContent =
+        Number(
+            data.total_orders || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "totalSales"
+    ).textContent =
+        "₦" +
+        Number(
+            data.total_sales || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "pendingVerifications"
+    ).textContent =
+        Number(
+            data.pending_verifications ||
+            0
+        ).toLocaleString();
+
+}
+
+
+/* LOAD SELLER VERIFICATION REQUESTS */
+
+async function loadRequests() {
+
+    requestsBox.innerHTML =
+        "<div class='loading'>" +
+        "Loading verification requests..." +
+        "</div>";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from(
+                "seller_verification_requests"
+            )
+
+            .select("*")
+
+            .eq(
+                "status",
+                "pending"
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        requestsBox.innerHTML =
+            "";
+
+        showMessage(
+            "Could not load requests: " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        requestsBox.innerHTML =
+            "<div class='empty'>" +
+            "No pending verification requests." +
+            "</div>";
+
+        return;
+
+    }
+
+
+    requestsBox.innerHTML =
+        "";
+
+
+    data.forEach(
+        request => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "request";
+
+
+            card.innerHTML = `
+
+                <div class="request-header">
+
+                    <h2>
+
+                        ${escapeHTML(
+                            request.full_name ||
+                            "Unnamed Seller"
+                        )}
+
+                    </h2>
+
+                    <span class="status">
+                        Pending
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <strong>
+                        Phone:
+                    </strong>
+
+                    ${escapeHTML(
+                        request.phone ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        State:
+                    </strong>
+
+                    ${escapeHTML(
+                        request.state ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Country:
+                    </strong>
+
+                    ${escapeHTML(
+                        request.country ||
+                        "Nigeria"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Submitted:
+                    </strong>
+
+                    ${escapeHTML(
+                        request.created_at
+                        ? new Date(
+                            request.created_at
+                        ).toLocaleString()
+                        : "Unknown"
+                    )}
+
+
+                    <div class="note">
+
+                        <strong>
+                            About the seller:
+                        </strong>
+
+                        <br>
+
+                        ${escapeHTML(
+                            request.verification_note ||
+                            "No verification note provided."
+                        )}
+
+                    </div>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <button
+                        class="approve"
+                        data-id="${escapeHTML(
+                            request.id
+                        )}"
+                        data-status="approved"
+                    >
+                        ✓ Approve
+                    </button>
+
+
+                    <button
+                        class="reject"
+                        data-id="${escapeHTML(
+                            request.id
+                        )}"
+                        data-status="rejected"
+                    >
+                        ✕ Reject
+                    </button>
+
+                </div>
+
+            `;
+
+
+            requestsBox.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    document
+        .querySelectorAll(
+            "#requests button[data-id]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        updateRequest(
+                            button.dataset.id,
+                            button.dataset.status,
+                            button
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* APPROVE / REJECT */
+
+async function updateRequest(
+    requestId,
+    newStatus,
+    button
+) {
+
+    const action =
+        newStatus === "approved"
+            ? "approve"
+            : "reject";
+
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to " +
+            action +
+            " this verification request?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    button.disabled =
+        true;
+
+
+    const {
+        data: { user },
+        error: userError
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        userError ||
+        !user
+    ) {
+
+        button.disabled =
+            false;
+
+        showMessage(
+            "Your login session has expired.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+
+            .from(
+                "seller_verification_requests"
+            )
+
+            .update({
+
+                status:
+                    newStatus,
+
+                reviewed_at:
+                    new Date()
+                        .toISOString()
+
+            })
+
+            .eq(
+                "id",
+                requestId
+            );
+
+
+    if (error) {
+
+        button.disabled =
+            false;
+
+        showMessage(
+            "Update failed: " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        newStatus === "approved"
+            ? "Seller verified successfully."
+            : "Verification request rejected.",
+        "success"
+    );
+
+
+    await loadRequests();
+
+    await loadDashboardStats();
+
+}
+
+
+/* LOAD ADMIN ORDERS */
+
+async function loadAdminOrders(
+    searchTerm = ""
+) {
+
+    const ordersBox =
+        document.getElementById(
+            "adminOrders"
+        );
+
+
+    ordersBox.innerHTML =
+        "<div class='loading'>" +
+        "Searching orders..." +
+        "</div>";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "get_admin_orders",
+            {
+                p_search:
+                    searchTerm.trim()
+            }
+        );
+
+
+    if (error) {
+
+        ordersBox.innerHTML =
+            "";
+
+        showMessage(
+            "Could not load orders: " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        ordersBox.innerHTML =
+            "<div class='empty'>" +
+            "No matching orders found." +
+            "</div>";
+
+        return;
+
+    }
+
+
+    ordersBox.innerHTML =
+        "";
+
+
+    data.forEach(
+        order => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "request";
+
+
+            card.innerHTML = `
+
+                <div class="request-header">
+
+                    <h2>
+
+                        Order #${escapeHTML(
+                            order.id
+                        ).slice(0, 8)}
+
+                    </h2>
+
+
+                    <span class="status">
+
+                        ${escapeHTML(
+                            order.order_status ||
+                            "pending"
+                        )}
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <strong>
+                        Customer:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.customer_name ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Phone:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.phone ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Location:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.city ||
+                        "Not provided"
+                    )},
+                    ${escapeHTML(
+                        order.state ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Address:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.address ||
+                        "Not provided"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Total:
+                    </strong>
+
+                    ₦${Number(
+                        order.total_amount ||
+                        0
+                    ).toLocaleString()}
+
+                    <br>
+
+
+                    <strong>
+                        Payment:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.payment_status ||
+                        "pending"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Payment Reference:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.payment_reference ||
+                        "Not available"
+                    )}
+
+                    <br>
+
+
+                    <strong>
+                        Date:
+                    </strong>
+
+                    ${escapeHTML(
+                        order.created_at
+                        ? new Date(
+                            order.created_at
+                        ).toLocaleString()
+                        : "Unknown"
+                    )}
+
+                </div>
+
+
+                <div class="actions">
+
+                    <button
+                        type="button"
+                        class="details-button"
+                        data-order-id="${escapeHTML(
+                            order.id
+                        )}"
+                    >
+                        👁 View Details
+                    </button>
+
+                </div>
+
+            `;
+
+
+            ordersBox.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    document
+        .querySelectorAll(
+            "#adminOrders .details-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openOrderDetails(
+                            button.dataset.orderId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* OPEN ORDER DETAILS */
+
+async function openOrderDetails(
+    orderId
+) {
+
+    orderDetailsModal.style.display =
+        "block";
+
+
+    orderDetailsContent.innerHTML =
+        "<div class='loading'>" +
+        "Loading order details..." +
+        "</div>";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "get_admin_order_details",
+            {
+                p_order_id:
+                    orderId
+            }
+        );
+
+
+    if (error) {
+
+        orderDetailsContent.innerHTML = `
+
+            <div class="empty">
+
+                Could not load order details.
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        orderDetailsContent.innerHTML = `
+
+            <div class="empty">
+
+                No details were found
+                for this order.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const order =
+        data[0];
+
+
+    let itemsHTML =
+        "";
+
+
+    data.forEach(
+        item => {
+
+            if (
+                !item.product_id
+            ) {
+
+                return;
+
+            }
+
+
+            itemsHTML += `
+
+                <div class="order-item">
+
+                    <div class="order-item-name">
+
+                        ${escapeHTML(
+                            item.product_name ||
+                            "Unnamed product"
+                        )}
+
+                    </div>
+
+
+                    <div class="order-item-info">
+
+                        Product ID:
+                        ${escapeHTML(
+                            item.product_id
+                        )}
+
+                        <br>
+
+                        Quantity:
+                        ${escapeHTML(
+                            item.quantity ||
+                            0
+                        )}
+
+                        <br>
+
+                        Price:
+                        ₦${Number(
+                            item.price ||
+                            0
+                        ).toLocaleString()}
+
+                        <br>
+
+                        Seller ID:
+                        ${escapeHTML(
+                            item.seller_id ||
+                            "Not available"
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    if (!itemsHTML) {
+
+        itemsHTML =
+            "<p class='detail-row'>" +
+            "No order items found." +
+            "</p>";
+
+    }
+
+
+    orderDetailsContent.innerHTML = `
+
+        <div class="detail-section">
+
+            <h3>
+                Order Information
+            </h3>
+
+            <div class="detail-row">
+
+                <strong>
+                    Order ID:
+                </strong>
+
+                ${escapeHTML(
+                    order.order_id
+                )}
+
+                <br>
+
+
+                <strong>
+                    Order Status:
+                </strong>
+
+                ${escapeHTML(
+                    order.order_status ||
+                    "pending"
+                )}
+
+                <br>
+
+
+                <strong>
+                    Payment Status:
+                </strong>
+
+                ${escapeHTML(
+                    order.payment_status ||
+                    "pending"
+                )}
+
+                <br>
+
+
+                <strong>
+                    Payment Reference:
+                </strong>
+
+                ${escapeHTML(
+                    order.payment_reference ||
+                    "Not available"
+                )}
+
+                <br>
+
+
+                <strong>
+                    Created:
+                </strong>
+
+                ${escapeHTML(
+                    order.created_at
+                    ? new Date(
+                        order.created_at
+                    ).toLocaleString()
+                    : "Unknown"
+                )}
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>
+                Customer & Delivery
+            </h3>
+
+            <div class="detail-row">
+
+                <strong>
+                    Customer:
+                </strong>
+
+                ${escapeHTML(
+                    order.customer_name ||
+                    "Not provided"
+                )}
+
+                <br>
+
+
+                <strong>
+                    Phone:
+                </strong>
+
+                ${escapeHTML(
+                    order.phone ||
+                    "Not provided"
+                )}
+
+                <br>
+
+
+                <strong>
+                    State:
+                </strong>
+
+                ${escapeHTML(
+                    order.state ||
+                    "Not provided"
+                )}
+
+                <br>
+
+
+                <strong>
+                    City:
+                </strong>
+
+                ${escapeHTML(
+                    order.city ||
+                    "Not provided"
+                )}
+
+                <br>
+
+
+                <strong>
+                    Address:
+                </strong>
+
+                ${escapeHTML(
+                    order.address ||
+                    "Not provided"
+                )}
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>
+                Products
+            </h3>
+
+            ${itemsHTML}
+
+            <div class="order-total">
+
+                Order Total:
+                ₦${Number(
+                    order.total_amount ||
+                    0
+                ).toLocaleString()}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* CLOSE ORDER MODAL */
+
+document
+    .getElementById(
+        "closeOrderModal"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            orderDetailsModal.style.display =
+                "none";
+
+        }
+    );
+
+
+/* CLOSE WHEN CLICKING OUTSIDE */
+
+orderDetailsModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            orderDetailsModal
+        ) {
+
+            orderDetailsModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* SEARCH BUTTON */
+
+document
+    .getElementById(
+        "searchOrdersBtn"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            const searchTerm =
+                document
+                    .getElementById(
+                        "orderSearch"
+                    )
+                    .value;
+
+
+            loadAdminOrders(
+                searchTerm
+            );
+
+        }
+    );
+
+
+/* CLEAR BUTTON */
+
+document
+    .getElementById(
+        "clearOrdersBtn"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "orderSearch"
+                )
+                .value = "";
+
+
+            loadAdminOrders();
+
+        }
+    );
+
+
+/* ENTER KEY SEARCH */
+
+document
+    .getElementById(
+        "orderSearch"
+    )
+    .addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                document
+                    .getElementById(
+                        "searchOrdersBtn"
+                    )
+                    .click();
+
+            }
+
+        }
+    );
+
+
+/* START ADMIN PANEL */
+
+async function startAdminPanel() {
+
+    const isAdmin =
+        await checkAdmin();
+
+
+    if (!isAdmin) {
+
+        return;
+
+    }
+
+
+    await loadDashboardStats();
+
+    await loadRequests();
+
+    await loadAdminOrders();
+
+}
+
+
+startAdminPanel();
+
+
+</script>
+
+</body>
+
+</html>

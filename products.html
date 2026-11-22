@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUVORA - Shop</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f8fa;
+            color: #111;
+        }
+
+        header {
+            background: white;
+            padding: 16px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        nav {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #222;
+            font-size: 14px;
+        }
+
+        .login,
+        .logout {
+            background: #111;
+            color: white;
+            padding: 9px 13px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .shop-header {
+            padding: 45px 6% 25px;
+        }
+
+        .shop-header h1 {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .shop-header p {
+            color: #666;
+        }
+
+        .search-area {
+            padding: 0 6% 30px;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 700px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+        }
+
+        .filters {
+            padding: 0 6% 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .products {
+            padding: 0 6% 60px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 210px;
+            background: #e9e9e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-info h3 {
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .category {
+            color: #555;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .stock {
+            color: #777;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 14px 4%;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            nav {
+                gap: 7px;
+            }
+
+            nav a,
+            .user-name,
+            .logout {
+                font-size: 12px;
+            }
+
+            .products {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 0 4% 40px;
+            }
+
+            .product-image {
+                height: 150px;
+            }
+
+            .shop-header,
+            .search-area,
+            .filters {
+                padding-left: 4%;
+                padding-right: 4%;
+            }
+
+            .shop-header h1 {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        NUVORA
+    </div>
+
+    <nav>
+
+        <a href="index.html">Home</a>
+
+        <a href="sell.html">Sell</a>
+
+        <div id="authArea">
+            <a href="signup.html">Sign Up</a>
+            <a href="login.html" class="login">Log In</a>
+        </div>
+
+    </nav>
+
+</header>
+
+
+<section class="shop-header">
+
+    <h1>Explore Products</h1>
+
+    <p>
+        Discover products from sellers on NUVORA.
+    </p>
+
+</section>
+
+
+<section class="search-area">
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search for products..."
+        >
+
+        <button onclick="searchProducts()">
+            Search
+        </button>
+
+    </div>
+
+</section>
+
+
+<div class="filters">
+
+    <button class="filter" onclick="filterProducts('All')">
+        All
+    </button>
+
+    <button class="filter" onclick="filterProducts('Electronics')">
+        Electronics
+    </button>
+
+    <button class="filter" onclick="filterProducts('Fashion')">
+        Fashion
+    </button>
+
+    <button class="filter" onclick="filterProducts('Computers')">
+        Computers
+    </button>
+
+    <button class="filter" onclick="filterProducts('Home')">
+        Home
+    </button>
+
+</div>
+
+
+<section class="products" id="products">
+
+    <div class="message">
+        Loading products...
+    </div>
+
+</section>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+let allProducts = [];
+
+
+/* ==============================
+   LOGIN STATUS
+============================== */
+
+async function checkUser() {
+
+    const authArea =
+        document.getElementById("authArea");
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+
+    if (user) {
+
+        const name =
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User";
+
+
+        authArea.innerHTML = `
+
+            <span class="user-name">
+                Hi, ${name}
+            </span>
+
+            <button
+                class="logout"
+                onclick="logout()"
+            >
+                Log Out
+            </button>
+
+        `;
+
+    } else {
+
+        authArea.innerHTML = `
+
+            <a href="signup.html">
+                Sign Up
+            </a>
+
+            <a
+                href="login.html"
+                class="login"
+            >
+                Log In
+            </a>
+
+        `;
+
+    }
+
+}
+
+
+/* ==============================
+   LOG OUT
+============================== */
+
+async function logout() {
+
+    const { error } =
+        await supabaseClient.auth.signOut();
+
+
+    if (error) {
+
+        alert(
+            "Unable to log out: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    window.location.reload();
+
+}
+
+
+/* ==============================
+   LOAD PRODUCTS
+============================== */
+
+async function loadProducts() {
+
+    const container =
+        document.getElementById("products");
+
+
+    const { data, error } =
+        await supabaseClient
+        .from("products")
+        .select("*")
+        .order("created_at", {
+            ascending: false
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+
+            <div class="message">
+                Unable to load products.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    allProducts = data || [];
+
+    displayProducts(allProducts);
+
+}
+
+
+/* ==============================
+   DISPLAY PRODUCTS
+============================== */
+
+function displayProducts(products) {
+
+    const container =
+        document.getElementById("products");
+
+
+    if (products.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="message">
+                No products found yet.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        products.map(product => {
+
+            const image =
+                product.image_url
+
+                ? `
+                    <img
+                        src="${product.image_url}"
+                        alt="${product.name || "Product"}"
+                    >
+                  `
+
+                : "Product Image";
+
+
+            return `
+
+                <div
+                    class="product-card"
+                    onclick="openProduct('${product.id}')"
+                >
+
+                    <div class="product-image">
+                        ${image}
+                    </div>
+
+                    <div class="product-info">
+
+                        <h3>
+                            ${product.name || "Unnamed Product"}
+                        </h3>
+
+                        <p class="price">
+                            ₦${Number(
+                                product.price || 0
+                            ).toLocaleString()}
+                        </p>
+
+                        <p class="category">
+                            ${product.category || "Other"}
+                        </p>
+
+                        <p class="stock">
+                            Stock: ${product.stock ?? 0}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* ==============================
+   OPEN PRODUCT
+============================== */
+
+function openProduct(id) {
+
+    window.location.href =
+        "product.html?id=" +
+        encodeURIComponent(id);
+
+}
+
+
+/* ==============================
+   SEARCH
+============================== */
+
+function searchProducts() {
+
+    const search =
+        document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    if (!search) {
+
+        displayProducts(allProducts);
+
+        return;
+    }
+
+
+    const results =
+        allProducts.filter(product =>
+
+            (product.name || "")
+            .toLowerCase()
+            .includes(search)
+
+            ||
+
+            (product.description || "")
+            .toLowerCase()
+            .includes(search)
+
+            ||
+
+            (product.category || "")
+            .toLowerCase()
+            .includes(search)
+
+        );
+
+
+    displayProducts(results);
+
+}
+
+
+/* ==============================
+   CATEGORY FILTER
+============================== */
+
+function filterProducts(category) {
+
+    if (category === "All") {
+
+        displayProducts(allProducts);
+
+        return;
+    }
+
+
+    const results =
+        allProducts.filter(product =>
+
+            (product.category || "")
+            .toLowerCase() ===
+            category.toLowerCase()
+
+        );
+
+
+    displayProducts(results);
+
+}
+
+
+/* ==============================
+   ENTER KEY SEARCH
+============================== */
+
+document
+.getElementById("searchInput")
+.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            searchProducts();
+
+        }
+
+    }
+);
+
+
+/* ==============================
+   START
+============================== */
+
+checkUser();
+
+
+async function startShop() {
+
+    await loadProducts();
+
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const category =
+        params.get("category");
+
+
+    const search =
+        params.get("search");
+
+
+    if (category) {
+
+        filterProducts(category);
+
+    } else if (search) {
+
+        document
+            .getElementById("searchInput")
+            .value = search;
+
+        searchProducts();
+
+    }
+
+}
+
+
+startShop();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUVORA - Sign Up</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .home-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .signup-box {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #111827;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: #111827;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .signup-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 13px;
+            background: white;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .google-btn:hover {
+            background: #f9fafb;
+        }
+
+        .message {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .login-text {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14px;
+        }
+
+        .login-text a {
+            color: #111827;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                margin: 25px auto;
+            }
+
+            .signup-box {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">NUVORA</div>
+    <a href="index.html" class="home-link">Home</a>
+</header>
+
+<div class="container">
+
+    <div class="signup-box">
+
+        <h1>Create Account</h1>
+
+        <p class="subtitle">
+            Join NUVORA and start shopping smarter.
+        </p>
+
+        <form id="signupForm">
+
+            <label for="name">Full Name</label>
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label for="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label for="password">Password</label>
+
+            <div class="password-wrapper">
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="At least 6 characters"
+                    minlength="6"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    onclick="togglePassword('password', this)"
+                >
+                    👁
+                </button>
+            </div>
+
+            <label for="confirmPassword">Confirm Password</label>
+
+            <div class="password-wrapper">
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm your password"
+                    minlength="6"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    onclick="togglePassword('confirmPassword', this)"
+                >
+                    👁
+                </button>
+            </div>
+
+            <button
+                type="submit"
+                class="signup-btn"
+                id="signupBtn"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="divider">
+            OR
+        </div>
+
+        <button
+            type="button"
+            class="google-btn"
+            id="googleBtn"
+        >
+            Continue with Google
+        </button>
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+        <div class="login-text">
+            Already have an account?
+            <a href="login.html">Log In</a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // ==========================================
+    // NUVORA SUPABASE CONNECTION
+    // ==========================================
+
+    const SUPABASE_URL =
+        "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+    const supabaseClient =
+        supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    // ==========================================
+    // PASSWORD SHOW / HIDE
+    // ==========================================
+
+    function togglePassword(inputId, button) {
+
+        const input =
+            document.getElementById(inputId);
+
+        if (input.type === "password") {
+
+            input.type = "text";
+            button.textContent = "🙈";
+
+        } else {
+
+            input.type = "password";
+            button.textContent = "👁";
+
+        }
+    }
+
+
+    // ==========================================
+    // EMAIL SIGN UP
+    // ==========================================
+
+    document
+        .getElementById("signupForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const name =
+                document.getElementById("name").value.trim();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+            const message =
+                document.getElementById("message");
+
+            const signupBtn =
+                document.getElementById("signupBtn");
+
+
+            message.textContent = "";
+            message.style.color = "#dc2626";
+
+
+            // Check password length
+
+            if (password.length < 6) {
+
+                message.textContent =
+                    "Password must be at least 6 characters.";
+
+                return;
+            }
+
+
+            // Check passwords
+
+            if (password !== confirmPassword) {
+
+                message.textContent =
+                    "Passwords do not match.";
+
+                return;
+            }
+
+
+            signupBtn.disabled = true;
+            signupBtn.textContent =
+                "Creating account...";
+
+
+            try {
+
+                const { data, error } =
+                    await supabaseClient.auth.signUp({
+
+                        email: email,
+
+                        password: password,
+
+                        options: {
+
+                            data: {
+                                full_name: name
+                            }
+
+                        }
+
+                    });
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                // Save the email so verify.html
+                // knows which account is being verified.
+
+                localStorage.setItem(
+                    "nuvoraVerificationEmail",
+                    email
+                );
+
+
+                // Send the user to the verification page.
+
+                window.location.href =
+                    "verify.html";
+
+
+            } catch (error) {
+
+                message.style.color =
+                    "#dc2626";
+
+                message.textContent =
+                    error.message;
+
+                signupBtn.disabled = false;
+
+                signupBtn.textContent =
+                    "Create Account";
+            }
+
+        });
+
+
+    // ==========================================
+    // GOOGLE SIGN UP
+    // ==========================================
+
+    document
+        .getElementById("googleBtn")
+        .addEventListener("click", async function() {
+
+            const message =
+                document.getElementById("message");
+
+            try {
+
+                const { error } =
+                    await supabaseClient.auth.signInWithOAuth({
+
+                        provider: "google",
+
+                        options: {
+
+                            redirectTo:
+                                window.location.origin +
+                                "/index.html"
+
+                        }
+
+                    });
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+            } catch (error) {
+
+                message.style.color =
+                    "#dc2626";
+
+                message.textContent =
+                    error.message;
+
+            }
+
+        });
+
+</script>
+
+</body>
+</html>

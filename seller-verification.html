@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NUVORA - Seller Verification</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 16px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+}
+
+.logo {
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    gap: 18px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    max-width: 650px;
+    margin: 35px auto;
+    padding: 0 18px;
+}
+
+.card {
+    background: white;
+    padding: 28px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.08);
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.intro {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+    margin-top: 18px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #2563eb;
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.submit-btn {
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #1d4ed8;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.message {
+    margin-top: 18px;
+
+    padding: 13px;
+
+    border-radius: 8px;
+
+    display: none;
+
+    line-height: 1.5;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-box {
+    margin-bottom: 25px;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+
+    color: #1e40af;
+
+    display: none;
+}
+
+@media (max-width: 550px) {
+
+    header {
+        padding: 14px 16px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    nav {
+        gap: 10px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .card {
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html" class="logo">
+        NUVORA
+    </a>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="seller-dashboard.html">Dashboard</a>
+    </nav>
+
+</header>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>
+            Seller Verification
+        </h1>
+
+        <p class="intro">
+            Submit your information for NUVORA to review.
+            Verification is reviewed before the Verified Seller
+            badge is granted.
+        </p>
+
+
+        <div
+            id="statusBox"
+            class="status-box"
+        ></div>
+
+
+        <form id="verificationForm">
+
+            <label for="fullName">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Enter your full name"
+                required
+            >
+
+
+            <label for="phone">
+                Phone Number
+            </label>
+
+            <input
+                type="tel"
+                id="phone"
+                placeholder="Enter your phone number"
+                required
+            >
+
+
+            <label for="state">
+                State
+            </label>
+
+            <select id="state" required>
+
+                <option value="">
+                    Select your state
+                </option>
+
+                <option>Abia</option>
+                <option>Adamawa</option>
+                <option>Akwa Ibom</option>
+                <option>Anambra</option>
+                <option>Bauchi</option>
+                <option>Bayelsa</option>
+                <option>Benue</option>
+                <option>Borno</option>
+                <option>Cross River</option>
+                <option>Delta</option>
+                <option>Ebonyi</option>
+                <option>Edo</option>
+                <option>Ekiti</option>
+                <option>Enugu</option>
+                <option>Gombe</option>
+                <option>Imo</option>
+                <option>Jigawa</option>
+                <option>Kaduna</option>
+                <option>Kano</option>
+                <option>Katsina</option>
+                <option>Kebbi</option>
+                <option>Kogi</option>
+                <option>Kwara</option>
+                <option>Lagos</option>
+                <option>Nasarawa</option>
+                <option>Niger</option>
+                <option>Ogun</option>
+                <option>Ondo</option>
+                <option>Osun</option>
+                <option>Oyo</option>
+                <option>Plateau</option>
+                <option>Rivers</option>
+                <option>Sokoto</option>
+                <option>Taraba</option>
+                <option>Yobe</option>
+                <option>Zamfara</option>
+                <option>Federal Capital Territory</option>
+
+            </select>
+
+
+            <label for="verificationNote">
+                About You / Your Business
+            </label>
+
+            <textarea
+                id="verificationNote"
+                placeholder="Tell NUVORA about yourself or your business and why you want to become a verified seller."
+                required
+            ></textarea>
+
+
+            <button
+                type="submit"
+                class="submit-btn"
+                id="submitBtn"
+            >
+                Submit Verification Request
+            </button>
+
+        </form>
+
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://rrkbgfdzktoeqiaktzcz.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_XxydhD3XZ46n378xLbE22w_LTtgAtlV";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const form =
+    document.getElementById(
+        "verificationForm"
+    );
+
+const submitBtn =
+    document.getElementById(
+        "submitBtn"
+    );
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+const statusBox =
+    document.getElementById(
+        "statusBox"
+    );
+
+
+/* =====================================================
+   SHOW MESSAGE
+===================================================== */
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent =
+        text;
+
+    message.className =
+        "message " + type;
+
+    message.style.display =
+        "block";
+}
+
+
+/* =====================================================
+   LOAD USER
+===================================================== */
+
+async function loadUser() {
+
+    const {
+        data: { user },
+        error
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (error) {
+
+        console.error(error);
+
+        return null;
+    }
+
+
+    return user;
+}
+
+
+/* =====================================================
+   CHECK EXISTING REQUEST
+===================================================== */
+
+async function checkExistingRequest(user) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from(
+            "seller_verification_requests"
+        )
+        .select(
+            "status, created_at"
+        )
+        .eq(
+            "seller_id",
+            user.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+    }
+
+
+    if (!data) {
+        return;
+    }
+
+
+    statusBox.style.display =
+        "block";
+
+
+    if (data.status === "pending") {
+
+        statusBox.textContent =
+            "You already have a verification request under review.";
+
+        submitBtn.disabled =
+            true;
+
+    }
+
+    else if (data.status === "approved") {
+
+        statusBox.textContent =
+            "Your seller verification has been approved.";
+
+        submitBtn.disabled =
+            true;
+
+    }
+
+    else if (data.status === "rejected") {
+
+        statusBox.textContent =
+            "Your previous verification request was rejected. You may submit a new request.";
+
+    }
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+async function startPage() {
+
+    const user =
+        await loadUser();
+
+
+    if (!user) {
+
+        statusBox.style.display =
+            "block";
+
+        statusBox.textContent =
+            "Please log in before requesting seller verification.";
+
+        form.style.display =
+            "none";
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       PREFILL EMAIL-BASED NAME
+    --------------------------------------------- */
+
+    const metadataName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        "";
+
+
+    if (metadataName) {
+
+        document.getElementById(
+            "fullName"
+        ).value =
+            metadataName;
+
+    }
+
+
+    await checkExistingRequest(user);
+
+}
+
+
+/* =====================================================
+   SUBMIT VERIFICATION
+===================================================== */
+
+form.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        submitBtn.disabled =
+            true;
+
+        submitBtn.textContent =
+            "Submitting...";
+
+
+        message.style.display =
+            "none";
+
+
+        try {
+
+            const user =
+                await loadUser();
+
+
+            if (!user) {
+
+                showMessage(
+                    "Please log in first.",
+                    "error"
+                );
+
+                submitBtn.disabled =
+                    false;
+
+                submitBtn.textContent =
+                    "Submit Verification Request";
+
+                return;
+            }
+
+
+            const fullName =
+                document
+                .getElementById(
+                    "fullName"
+                )
+                .value
+                .trim();
+
+
+            const phone =
+                document
+                .getElementById(
+                    "phone"
+                )
+                .value
+                .trim();
+
+
+            const state =
+                document
+                .getElementById(
+                    "state"
+                )
+                .value;
+
+
+            const verificationNote =
+                document
+                .getElementById(
+                    "verificationNote"
+                )
+                .value
+                .trim();
+
+
+            if (
+                !fullName ||
+                !phone ||
+                !state ||
+                !verificationNote
+            ) {
+
+                showMessage(
+                    "Please complete all fields.",
+                    "error"
+                );
+
+                submitBtn.disabled =
+                    false;
+
+                submitBtn.textContent =
+                    "Submit Verification Request";
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               CHECK FOR EXISTING PENDING REQUEST
+            ----------------------------------------- */
+
+            const {
+                data: existingRequest,
+                error: existingError
+            } =
+                await supabaseClient
+                .from(
+                    "seller_verification_requests"
+                )
+                .select(
+                    "id, status"
+                )
+                .eq(
+                    "seller_id",
+                    user.id
+                )
+                .eq(
+                    "status",
+                    "pending"
+                )
+                .maybeSingle();
+
+
+            if (existingError) {
+
+                throw existingError;
+            }
+
+
+            if (existingRequest) {
+
+                showMessage(
+                    "You already have a verification request under review.",
+                    "error"
+                );
+
+                submitBtn.disabled =
+                    true;
+
+                submitBtn.textContent =
+                    "Request Already Submitted";
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               INSERT REQUEST
+            ----------------------------------------- */
+
+            const {
+                error
+            } =
+                await supabaseClient
+                .from(
+                    "seller_verification_requests"
+                )
+                .insert({
+
+                    seller_id:
+                        user.id,
+
+                    full_name:
+                        fullName,
+
+                    phone:
+                        phone,
+
+                    country:
+                        "Nigeria",
+
+                    state:
+                        state,
+
+                    verification_note:
+                        verificationNote,
+
+                    status:
+                        "pending"
+
+                });
+
+
+            if (error) {
+
+                throw error;
+            }
+
+
+            showMessage(
+                "Verification request submitted successfully. NUVORA will review it.",
+                "success"
+            );
+
+
+            statusBox.style.display =
+                "block";
+
+            statusBox.textContent =
+                "Verification status: Pending review.";
+
+
+            form.reset();
+
+
+            submitBtn.textContent =
+                "Request Submitted";
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to submit your verification request: " +
+                error.message,
+                "error"
+            );
+
+
+            submitBtn.disabled =
+                false;
+
+            submitBtn.textContent =
+                "Submit Verification Request";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   RUN
+===================================================== */
+
+startPage();
+
+</script>
+
+</body>
+</html>
